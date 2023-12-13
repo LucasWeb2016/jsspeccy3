@@ -1,3 +1,6 @@
+/* ARCHIVO DE ENTRADA DEL PROYECTO */
+
+/* IMPORTS -> TODO Revisar linea a linea */
 import EventEmitter from 'events';
 import fileDialog from 'file-dialog';
 import JSZip from 'jszip';
@@ -22,28 +25,36 @@ const scriptUrl = document.currentScript.src;
 
 class Emulator extends EventEmitter {
     constructor(canvas, opts) {
-        super();
-        this.canvas = canvas;
-        this.worker = new Worker(new URL('jsspeccy-worker.js', scriptUrl));
-        this.keyboardEnabled = ('keyboardEnabled' in opts) ? opts.keyboardEnabled : true;
+
+        // Debug
+        console.log(canvas);
+        console.log(opts);
+        // Debug
+        super(); // Llama al constructor de la clase extendida "EventEmitter"
+        this.canvas = canvas; // Almacena canvas recibido
+        this.worker = new Worker(new URL('jsspeccy-worker.js', scriptUrl)); // Inicializa el worker
+        this.keyboardEnabled = ('keyboardEnabled' in opts) ? opts.keyboardEnabled : true; // Comprueba si el teclado debe estar activo o no. Por defecto si.
         if (this.keyboardEnabled) {
-            this.keyboardHandler = new KeyboardHandler(this.worker, opts.keyboardEventRoot || document);
+            this.keyboardHandler = new KeyboardHandler(this.worker, opts.keyboardEventRoot || document); // Como el teclado está activo, inicia el control de teclado
         }
-        this.displayHandler = new DisplayHandler(this.canvas);
-        this.audioHandler = new AudioHandler();
-        this.isRunning = false;
-        this.isReady = false;
-        this.isInitiallyPaused = (!opts.autoStart);
-        this.autoLoadTapes = opts.autoLoadTapes || false;
-        this.tapeAutoLoadMode = opts.tapeAutoLoadMode || 'default';  // or usr0
-        this.tapeIsPlaying = false;
-        this.tapeTrapsEnabled = ('tapeTrapsEnabled' in opts) ? opts.tapeTrapsEnabled : true;
+        this.displayHandler = new DisplayHandler(this.canvas); // Inicia el control de Display
+        this.audioHandler = new AudioHandler(); // Inicia el control de sonido
+        this.isRunning = false; // Por defecto la maquina no está activa
+        this.isReady = false; // Por defecto la maquina no está inicialiada
+        this.isInitiallyPaused = (!opts.autoStart); // Autoarranque bool
+        this.autoLoadTapes = opts.autoLoadTapes || false; // Carga automatica de cintas bool
+        this.tapeAutoLoadMode = opts.tapeAutoLoadMode || 'default';  // tipo de carga 'default' o recibida por parametro
+        this.tapeIsPlaying = false; // Define si se esta reproduciendo o no una cinta bool. falso por defecto.
+        this.tapeTrapsEnabled = ('tapeTrapsEnabled' in opts) ? opts.tapeTrapsEnabled : true; // ???
 
-        this.msPerFrame = 20;
+        this.msPerFrame = 20; // Milisegundos por frame
+        // Un segundo son 1000 milisegundos
+        // 1000 / 20 = 50 frames por segundo
+        // Entiendo por tanto que la frecuencia de refresco del front respecto al worker es esta ????
 
-        this.isExecutingFrame = false;
-        this.nextFrameTime = null;
-        this.machineType = null;
+        this.isExecutingFrame = false; // Define si se esta ejecutando o no un frame actualmente . bool
+        this.nextFrameTime = null; // Almacena tiempo hasta el siguiente frame ???
+        this.machineType = null; // Tipo de maquina por defecto null
 
         this.nextFileOpenID = 0;
         this.fileOpenPromiseResolutions = {};
