@@ -1,10 +1,10 @@
 export default [
     {
         output: {
-            filename: 'jsspeccy/jsspeccy.js',
+            filename: 'jsspeccyplus/jsspeccyplus.js',
         },
-        name: 'jsspeccy',
-        entry: './runtime/jsspeccy.js',
+        name: 'jsspeccyplus',
+        entry: './runtime/jsspeccyplus.js',
         mode: 'production',
         module: {
             rules: [
@@ -17,7 +17,7 @@ export default [
     },
     {
         output: {
-            filename: 'jsspeccy/jsspeccy-worker.js',
+            filename: 'jsspeccyplus/jsspeccyplus-worker.js',
         },
         name: 'worker',
         entry: './runtime/worker.js',

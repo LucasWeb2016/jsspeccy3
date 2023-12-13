@@ -14,7 +14,7 @@ let tapeIsPlaying = false;
 
 const loadCore = (baseUrl) => {
     WebAssembly.instantiateStreaming(
-        fetch(new URL('jsspeccy-core.wasm', baseUrl), {})
+        fetch(new URL('jsspeccyplus-core.wasm', baseUrl), {})
     ).then(results => {
         core = results.instance.exports;
         memory = core.memory;
@@ -230,7 +230,7 @@ onmessage = (e) => {
                 mediaType: 'tape',
             });
             break;
-        
+
         case 'playTape':
             if (tape && !tapeIsPlaying) {
                 tapeIsPlaying = true;

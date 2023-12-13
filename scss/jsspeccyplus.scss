@@ -1,0 +1,11 @@
+// Variables - Colors
+$canvas-bg-color: #ffffff;
+$ui-bars-bg-color: #1b1919;
+
+// Variables - fonts
+$primary-font-family: monospace;
+
+div.jsspeccyplus-ui-bar {
+  background-color: $ui-bars-bg-color;
+  font-family:$primary-font-family;
+}

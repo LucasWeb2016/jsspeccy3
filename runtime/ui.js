@@ -8,10 +8,9 @@ export class MenuBar {
     constructor(container) {
         this.elem = document.createElement('div');
         this.elem.style.display = 'flow-root';
-        this.elem.style.backgroundColor = '#eee';
-        this.elem.style.fontFamily = 'Arial, Helvetica, sans-serif';
         this.elem.style.top = '0';
         this.elem.style.width = '100%';
+        this.elem.classList.add('jsspeccyplus-ui-bar');
         container.appendChild(this.elem);
         this.currentMouseenterEvent = null;
         this.currentMouseoutEvent = null;

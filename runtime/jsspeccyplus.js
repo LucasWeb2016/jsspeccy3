@@ -32,7 +32,7 @@ class Emulator extends EventEmitter {
         // Debug
         super(); // Llama al constructor de la clase extendida "EventEmitter"
         this.canvas = canvas; // Almacena canvas recibido
-        this.worker = new Worker(new URL('jsspeccy-worker.js', scriptUrl)); // Inicializa el worker
+        this.worker = new Worker(new URL('jsspeccyplus-worker.js', scriptUrl)); // Inicializa el worker
         this.keyboardEnabled = ('keyboardEnabled' in opts) ? opts.keyboardEnabled : true; // Comprueba si el teclado debe estar activo o no. Por defecto si.
         if (this.keyboardEnabled) {
             this.keyboardHandler = new KeyboardHandler(this.worker, opts.keyboardEventRoot || document); // Como el teclado está activo, inicia el control de teclado
@@ -61,78 +61,87 @@ class Emulator extends EventEmitter {
 
         this.onReadyHandlers = [];
 
-        this.worker.onmessage = (e) => {
+        this.worker.onmessage = (e) => { // Procesa los postmessages recibidos del worker
             switch(e.data.message) {
-                case 'ready':
-                    this.loadRoms().then(() => {
-                        this.setMachine(opts.machine || 128);
-                        this.setTapeTraps(this.tapeTrapsEnabled);
-                        if (opts.openUrl) {
-                            this.openUrlList(opts.openUrl).catch(err => {
+                case 'ready': // El worker está disponible
+                    console.log('WORKER - READY');
+                    this.loadRoms().then(() => { // Carga las roms (Todas, todos sistemas), y a continuacion
+                        this.setMachine(opts.machine || '2'); // Maquina recibida por parametro o 128 por defecto
+                        this.setTapeTraps(this.tapeTrapsEnabled); // Setea las trampas de casette?
+                        if (opts.openUrl) { // Comprueba si se ha recibido URL de algun software
+                            this.openUrlList(opts.openUrl).catch(err => { // En caso afirmativo carga la URL
                                 alert(err);
                             }).then(() => {
-                                if (opts.autoStart) this.start();
+                                if (opts.autoStart) this.start(); // Si todo ha ido OK y está el autostart en true, inicia la maquina.
                             });
                         } else if (opts.autoStart) {
-                            this.start();
+                            this.start(); // Si está el autostart en true, inicia la maquina.
                         }
 
-                        this.isReady = true;
-                        for (let i=0; i < this.onReadyHandlers.length; i++) {
+                        this.isReady = true; // Marca como ready
+                        console.log(this.onReadyHandlers);
+                        for (let i=0; i < this.onReadyHandlers.length; i++) {// Aqui por ahora no hay nada, revisar.
                             this.onReadyHandlers[i]();
                         }
+                        console.log(this.onReadyHandlers);
+
                     });
                     break;
-                case 'frameCompleted':
+                case 'frameCompleted': // Se ha completado un frame y nos informa para que lo carguemos en canvas
                     // benchmarkRunCount++;
-                    if ('audioBufferLeft' in e.data) {
+                    console.log('WORKER - FRAME COMPLETED');
+                    if ('audioBufferLeft' in e.data) { // Si hay audio, lo procesa
                         this.audioHandler.frameCompleted(e.data.audioBufferLeft, e.data.audioBufferRight);
                     }
 
-                    this.displayHandler.frameCompleted(e.data.frameBuffer);
-                    if (this.isRunning) {
-                        const time = performance.now();
-                        if (time > this.nextFrameTime) {
+                    this.displayHandler.frameCompleted(e.data.frameBuffer); // Actualiza el display
+                    if (this.isRunning) { // Si esta funcionando?
+                        const time = performance.now(); // Get current execution time
+                        if (time > this.nextFrameTime) { // Si es mayor que el tiempo para el proximo frame
                             /* running at full blast - start next frame but adjust time base
                             to give it the full time allocation */
-                            this.runFrame();
-                            this.nextFrameTime = time + this.msPerFrame;
+                            this.runFrame(); // corre el frame
+                            this.nextFrameTime = time + this.msPerFrame; // Define el tiempo para el siguiente frame (actual + 20ms)
                         } else {
-                            this.isExecutingFrame = false;
+                            this.isExecutingFrame = false; // Debe ejecutarse el frame? false
                         }
                     } else {
-                        this.isExecutingFrame = false;
+                        this.isExecutingFrame = false; // Debe ejecutarse el frame? false
                     }
                     break;
-                case 'fileOpened':
-                    if (e.data.mediaType == 'tape' && this.autoLoadTapes) {
-                        const TAPE_LOADERS_BY_MACHINE = {
-                            '48': {'default': 'tapeloaders/tape_48.szx', 'usr0': 'tapeloaders/tape_48.szx'},
-                            '128': {'default': 'tapeloaders/tape_128.szx', 'usr0': 'tapeloaders/tape_128_usr0.szx'},
-                            '5': {'default': 'tapeloaders/tape_pentagon.szx', 'usr0': 'tapeloaders/tape_pentagon_usr0.szx'},
+                case 'fileOpened': // Se ha abierto un archivo
+                    console.log('WORKER - FILE OPENED');
+                    if (e.data.mediaType == 'tape' && this.autoLoadTapes) { // Si es del tipo tape y esta configurado para que cargue automaticamente
+                        const TAPE_LOADERS_BY_MACHINE = { // Define los cargadores para cada maquina existente. usr0 es para interaccion cero? (Carga rapida de tapes)
+                            '1': {'default': 'tapeloaders/tape_48.szx', 'usr0': 'tapeloaders/tape_48.szx'},
+                            '2': {'default': 'tapeloaders/tape_128.szx', 'usr0': 'tapeloaders/tape_128_usr0.szx'},
+                            '3': {'default': 'tapeloaders/tape_128.szx', 'usr0': 'tapeloaders/tape_128_usr0.szx'},
+                            '4': {'default': 'tapeloaders/tape_pentagon.szx', 'usr0': 'tapeloaders/tape_pentagon_usr0.szx'},
                         };
                         this.openUrl(new URL(TAPE_LOADERS_BY_MACHINE[this.machineType][this.tapeAutoLoadMode], scriptUrl));
                         if (!this.tapeTrapsEnabled) {
-                            this.playTape();
+                            this.playTape(); // Si no estan habilitadas las trampas de carga, reproduce la cinta.
                         }
                     }
-                    this.fileOpenPromiseResolutions[e.data.id]({
+                    this.fileOpenPromiseResolutions[e.data.id]({ // Almacena el tipo de archivo que ha cargado ??
                         mediaType: e.data.mediaType,
                     });
                     if (e.data.mediaType == 'tape') {
-                        this.emit('openedTapeFile');
+                        this.emit('openedTapeFile'); //
                     }
                     break;
                 case 'playingTape':
+                    console.log('WORKER - PLAYING TAPE');
                     this.tapeIsPlaying = true;
                     this.emit('playingTape');
                     break;
                 case 'stoppedTape':
+                    console.log('WORKER - STOPPED TAPE');
                     this.tapeIsPlaying = false;
                     this.emit('stoppedTape');
                     break;
                 default:
-                    console.log('message received by host:', e.data);
+                    console.log('WORKER - '+e.data.message);
             }
         }
         this.worker.postMessage({
@@ -192,11 +201,15 @@ class Emulator extends EventEmitter {
     }
 
     async loadRoms() {
-        await this.loadRom('roms/128-0.rom', 8);
-        await this.loadRom('roms/128-1.rom', 9);
-        await this.loadRom('roms/48.rom', 10);
-        await this.loadRom('roms/pentagon-0.rom', 12);
-        await this.loadRom('roms/trdos.rom', 13);
+        console.log('CARGA ROMS');
+        await this.loadRom('roms/128-0.rom', 8); // ZX Spectrum 128k 0
+        await this.loadRom('roms/128-1.rom', 9); // ZX Spectrum 128k 1
+        await this.loadRom('roms/128-spanish-0.rom', 14); // ZX Spectrum 128k 0 ES
+        await this.loadRom('roms/128-spanish-1.rom', 15); // ZX Spectrum 128k 1 ES
+        await this.loadRom('roms/48.rom', 10); // ZX Spectrum 48k
+        await this.loadRom('roms/pentagon-0.rom', 12); // Clon - Pentagon 128k
+        await this.loadRom('roms/trdos.rom', 13); // Clon - Pentagon 128k TRDos
+
     }
 
 
@@ -238,7 +251,7 @@ class Emulator extends EventEmitter {
     };
 
     setMachine(type) {
-        if (type != 128 && type != 5) type = 48;
+        if (type != '1' && type != '3' && type != '4') type = '2';
         this.worker.postMessage({
             message: 'setMachineType',
             type,
@@ -408,7 +421,7 @@ class Emulator extends EventEmitter {
     }
 }
 
-window.JSSpeccy = (container, opts) => {
+window.JSSpeccyPlus = (container, opts) => {
     // let benchmarkRunCount = 0;
     // let benchmarkRenderCount = 0;
     opts = opts || {};
@@ -421,7 +434,7 @@ window.JSSpeccy = (container, opts) => {
     const uiEnabled = ('uiEnabled' in opts) ? opts.uiEnabled : true;
 
     const emu = new Emulator(canvas, {
-        machine: opts.machine || 128,
+        machine: opts.machine || '2',
         autoStart: opts.autoStart || false,
         autoLoadTapes: opts.autoLoadTapes || false,
         tapeAutoLoadMode: opts.tapeAutoLoadMode || 'default',
@@ -482,16 +495,20 @@ window.JSSpeccy = (container, opts) => {
         updateTapeTrapsCheckbox();
 
         const machineMenu = ui.menuBar.addMenu('Machine');
-        const machine48Item = machineMenu.addItem('Spectrum 48K', () => {
-            emu.setMachine(48);
+        const machine48Item = machineMenu.addItem('ZX Spectrum 48K', () => {
+            emu.setMachine('1');
             emu.focus();
         });
-        const machine128Item = machineMenu.addItem('Spectrum 128K', () => {
-            emu.setMachine(128);
+        const machine128Item = machineMenu.addItem('ZX Spectrum 128K', () => {
+            emu.setMachine('2');
             emu.focus();
         });
-        const machinePentagonItem = machineMenu.addItem('Pentagon 128', () => {
-            emu.setMachine(5);
+        const machine128esItem = machineMenu.addItem('ZX Spectrum 128K Spanish', () => {
+            emu.setMachine('3');
+            emu.focus();
+        });
+        const machinePentagonItem = machineMenu.addItem('Pentagon 128k', () => {
+            emu.setMachine('4');
             emu.focus();
         });
         const displayMenu = ui.menuBar.addMenu('Display');
@@ -526,17 +543,25 @@ window.JSSpeccy = (container, opts) => {
         setZoomCheckbox(ui.zoom);
 
         emu.on('setMachine', (type) => {
-            if (type == 48) {
+            if (type == '1') {
                 machine48Item.setBullet();
                 machine128Item.unsetBullet();
+                machine128esItem.unsetBullet();
                 machinePentagonItem.unsetBullet();
-            } else if (type == 128) {
+            } else if (type == '2') {
                 machine48Item.unsetBullet();
                 machine128Item.setBullet();
+                machine128esItem.unsetBullet();
+                machinePentagonItem.unsetBullet();
+            } else if (type == '3') {
+                machine48Item.unsetBullet();
+                machine128Item.unsetBullet();
+                machine128esItem.setBullet();
                 machinePentagonItem.unsetBullet();
             } else { // pentagon
                 machine48Item.unsetBullet();
                 machine128Item.unsetBullet();
+                machine128esItem.unsetBullet();
                 machinePentagonItem.setBullet();
             }
         });
@@ -701,18 +726,6 @@ window.JSSpeccy = (container, opts) => {
         emu.exit();
         ui.unload();
     }
-
-    /*
-        const benchmarkElement = document.getElementById('benchmark');
-        setInterval(() => {
-            benchmarkElement.innerText = (
-                "Running at " + benchmarkRunCount + "fps, rendering at "
-                + benchmarkRenderCount + "fps"
-            );
-            benchmarkRunCount = 0;
-            benchmarkRenderCount = 0;
-        }, 1000)
-    */
 
     return {
         setZoom: (zoom) => {ui.setZoom(zoom);},
