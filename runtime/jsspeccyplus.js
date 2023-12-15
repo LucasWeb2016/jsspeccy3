@@ -21,15 +21,12 @@ import exitFullscreenIcon from './icons/exitfullscreen.svg';
 import tapePlayIcon from './icons/tape_play.svg';
 import tapePauseIcon from './icons/tape_pause.svg';
 
+import { SupportedMachines } from './machines.js';
+
 const scriptUrl = document.currentScript.src;
 
 class Emulator extends EventEmitter {
     constructor(canvas, opts) {
-
-        // Debug
-        console.log(canvas);
-        console.log(opts);
-        // Debug
         super(); // Llama al constructor de la clase extendida "EventEmitter"
         this.canvas = canvas; // Almacena canvas recibido
         this.worker = new Worker(new URL('jsspeccyplus-worker.js', scriptUrl)); // Inicializa el worker
@@ -46,6 +43,7 @@ class Emulator extends EventEmitter {
         this.tapeAutoLoadMode = opts.tapeAutoLoadMode || 'default';  // tipo de carga 'default' o recibida por parametro
         this.tapeIsPlaying = false; // Define si se esta reproduciendo o no una cinta bool. falso por defecto.
         this.tapeTrapsEnabled = ('tapeTrapsEnabled' in opts) ? opts.tapeTrapsEnabled : true; // ???
+        this.supportedMachines = new SupportedMachines().getList(); // Obtiene listado de maquinas compatibles
 
         this.msPerFrame = 20; // Milisegundos por frame
         // Un segundo son 1000 milisegundos
@@ -62,10 +60,10 @@ class Emulator extends EventEmitter {
         this.onReadyHandlers = [];
 
         this.worker.onmessage = (e) => { // Procesa los postmessages recibidos del worker
-            switch(e.data.message) {
+            switch (e.data.message) {
                 case 'ready': // El worker está disponible
                     console.log('WORKER - READY');
-                    this.loadRoms().then(() => { // Carga las roms (Todas, todos sistemas), y a continuacion
+                    this.loadRoms(opts.machine || '2').then(() => { // Carga las roms (Todas, todos sistemas), y a continuacion
                         this.setMachine(opts.machine || '2'); // Maquina recibida por parametro o 128 por defecto
                         this.setTapeTraps(this.tapeTrapsEnabled); // Setea las trampas de casette?
                         if (opts.openUrl) { // Comprueba si se ha recibido URL de algun software
@@ -80,7 +78,7 @@ class Emulator extends EventEmitter {
 
                         this.isReady = true; // Marca como ready
                         console.log(this.onReadyHandlers);
-                        for (let i=0; i < this.onReadyHandlers.length; i++) {// Aqui por ahora no hay nada, revisar.
+                        for (let i = 0; i < this.onReadyHandlers.length; i++) {// Aqui por ahora no hay nada, revisar.
                             this.onReadyHandlers[i]();
                         }
                         console.log(this.onReadyHandlers);
@@ -112,13 +110,12 @@ class Emulator extends EventEmitter {
                 case 'fileOpened': // Se ha abierto un archivo
                     console.log('WORKER - FILE OPENED');
                     if (e.data.mediaType == 'tape' && this.autoLoadTapes) { // Si es del tipo tape y esta configurado para que cargue automaticamente
-                        const TAPE_LOADERS_BY_MACHINE = { // Define los cargadores para cada maquina existente. usr0 es para interaccion cero? (Carga rapida de tapes)
-                            '1': {'default': 'tapeloaders/tape_48.szx', 'usr0': 'tapeloaders/tape_48.szx'},
-                            '2': {'default': 'tapeloaders/tape_128.szx', 'usr0': 'tapeloaders/tape_128_usr0.szx'},
-                            '3': {'default': 'tapeloaders/tape_128.szx', 'usr0': 'tapeloaders/tape_128_usr0.szx'},
-                            '4': {'default': 'tapeloaders/tape_pentagon.szx', 'usr0': 'tapeloaders/tape_pentagon_usr0.szx'},
-                        };
-                        this.openUrl(new URL(TAPE_LOADERS_BY_MACHINE[this.machineType][this.tapeAutoLoadMode], scriptUrl));
+                        let tapeLoaders = {};
+                        const temp = this.supportedMachines;
+                        Object.keys(temp).forEach(function (item) {
+                            tapeLoaders[item] = { 'default': temp[item]['tape'], 'usr0': temp[item]['tape_usr0'] };
+                        });
+                        this.openUrl(new URL(tapeLoaders[this.machineType][this.tapeAutoLoadMode], scriptUrl));
                         if (!this.tapeTrapsEnabled) {
                             this.playTape(); // Si no estan habilitadas las trampas de carga, reproduce la cinta.
                         }
@@ -141,7 +138,7 @@ class Emulator extends EventEmitter {
                     this.emit('stoppedTape');
                     break;
                 default:
-                    console.log('WORKER - '+e.data.message);
+                    console.log('WORKER - ' + e.data.message);
             }
         }
         this.worker.postMessage({
@@ -200,18 +197,19 @@ class Emulator extends EventEmitter {
         });
     }
 
-    async loadRoms() {
-        console.log('CARGA ROMS');
-        await this.loadRom('roms/128-0.rom', 8); // ZX Spectrum 128k 0
-        await this.loadRom('roms/128-1.rom', 9); // ZX Spectrum 128k 1
-        await this.loadRom('roms/128-spanish-0.rom', 14); // ZX Spectrum 128k 0 ES
-        await this.loadRom('roms/128-spanish-1.rom', 15); // ZX Spectrum 128k 1 ES
-        await this.loadRom('roms/48.rom', 10); // ZX Spectrum 48k
-        await this.loadRom('roms/pentagon-0.rom', 12); // Clon - Pentagon 128k
-        await this.loadRom('roms/trdos.rom', 13); // Clon - Pentagon 128k TRDos
-
+    async loadRoms(machineId) {
+        const supportedMachine = this.supportedMachines[machineId];
+        // rom0
+        await this.loadRom(supportedMachine['rom0'], supportedMachine['rom0_page']);
+        // rom1
+        if (supportedMachine['rom1']) {
+            await this.loadRom(supportedMachine['rom1'], supportedMachine['rom1_page']);
+        }
+        // rom2
+        if (supportedMachine['rom2']) {
+            await this.loadRom(supportedMachine['rom2'], supportedMachine['rom2_page']);
+        }
     }
-
 
     runFrame() {
         this.isExecutingFrame = true;
@@ -251,17 +249,16 @@ class Emulator extends EventEmitter {
     };
 
     setMachine(type) {
-        if (type != '1' && type != '3' && type != '4') type = '2';
         this.worker.postMessage({
             message: 'setMachineType',
             type,
         });
         this.machineType = type;
-        this.emit('setMachine', type);
+        this.loadRoms(type).then(() => { this.emit('setMachine', type); });
     }
 
     reset() {
-        this.worker.postMessage({message: 'reset'});
+        this.worker.postMessage({ message: 'reset' });
     }
 
     loadSnapshot(snapshot) {
@@ -271,7 +268,8 @@ class Emulator extends EventEmitter {
             id: fileID,
             snapshot,
         })
-        this.emit('setMachine', snapshot.model);
+
+        this.loadRoms(snapshot.model).then(() => { this.emit('setMachine', snapshot.model); });
         return new Promise((resolve, reject) => {
             this.fileOpenPromiseResolutions[fileID] = resolve;
         });
@@ -365,7 +363,7 @@ class Emulator extends EventEmitter {
         const opener = this.getFileOpener(file.name);
         if (opener) {
             const buf = await file.arrayBuffer();
-            return opener(buf).catch(err => {alert(err);});
+            return opener(buf).catch(err => { alert(err); });
         } else {
             throw 'Unrecognised file type: ' + file.name;
         }
@@ -382,7 +380,7 @@ class Emulator extends EventEmitter {
         }
     }
     async openUrlList(urls) {
-        if (typeof(urls) === 'string') {
+        if (typeof (urls) === 'string') {
             return await this.openUrl(urls);
         } else {
             for (const url of urls) {
@@ -426,9 +424,12 @@ window.JSSpeccyPlus = (container, opts) => {
     // let benchmarkRenderCount = 0;
     opts = opts || {};
 
+    container.classList.add('jsspeccyplus-container');
+
     const canvas = document.createElement('canvas');
     canvas.width = 320;
     canvas.height = 240;
+    const supportedMachines = new SupportedMachines().getList();
 
     const keyboardEnabled = ('keyboardEnabled' in opts) ? opts.keyboardEnabled : true;
     const uiEnabled = ('uiEnabled' in opts) ? opts.uiEnabled : true;
@@ -456,13 +457,20 @@ window.JSSpeccyPlus = (container, opts) => {
     }
 
     if (uiEnabled) {
-        const fileMenu = ui.menuBar.addMenu('File');
+        const machineMenu = ui.menuBar.addMenu('Hardware', 'hardware');
+        // One menu item for each supported machine
+        Object.keys(supportedMachines).forEach(function (item) {
+            const fullTitle = supportedMachines[item]['title']+'('+supportedMachines[item]['lang']+')('+supportedMachines[item]['country']+' '+supportedMachines[item]['year']+' - '+supportedMachines[item]['manufacturer']+')';
+            const machineItem = machineMenu.addItem(fullTitle, () => {
+                emu.setMachine(item);
+                emu.focus();
+            }, item);
+        });
+
+        const fileMenu = ui.menuBar.addMenu('Software', 'software');
         if (!opts.sandbox) {
-            fileMenu.addItem('Open...', () => {
+            fileMenu.addItem('Open', () => {
                 openFileDialog();
-            });
-            fileMenu.addItem('Find games...', () => {
-                openGameBrowser();
             });
             const autoLoadTapesMenuItem = fileMenu.addItem('Auto-load tapes', () => {
                 emu.setAutoLoadTapes(!emu.autoLoadTapes);
@@ -470,9 +478,9 @@ window.JSSpeccyPlus = (container, opts) => {
             });
             const updateAutoLoadTapesCheckbox = () => {
                 if (emu.autoLoadTapes) {
-                    autoLoadTapesMenuItem.setCheckbox();
+                    autoLoadTapesMenuItem.setActive();
                 } else {
-                    autoLoadTapesMenuItem.unsetCheckbox();
+                    autoLoadTapesMenuItem.unsetActive();
                 }
             }
             emu.on('setAutoLoadTapes', updateAutoLoadTapesCheckbox);
@@ -486,54 +494,36 @@ window.JSSpeccyPlus = (container, opts) => {
 
         const updateTapeTrapsCheckbox = () => {
             if (emu.tapeTrapsEnabled) {
-                tapeTrapsMenuItem.setCheckbox();
+                tapeTrapsMenuItem.setActive();
             } else {
-                tapeTrapsMenuItem.unsetCheckbox();
+                tapeTrapsMenuItem.unsetActive();
             }
         }
         emu.on('setTapeTraps', updateTapeTrapsCheckbox);
         updateTapeTrapsCheckbox();
 
-        const machineMenu = ui.menuBar.addMenu('Machine');
-        const machine48Item = machineMenu.addItem('ZX Spectrum 48K', () => {
-            emu.setMachine('1');
-            emu.focus();
-        });
-        const machine128Item = machineMenu.addItem('ZX Spectrum 128K', () => {
-            emu.setMachine('2');
-            emu.focus();
-        });
-        const machine128esItem = machineMenu.addItem('ZX Spectrum 128K Spanish', () => {
-            emu.setMachine('3');
-            emu.focus();
-        });
-        const machinePentagonItem = machineMenu.addItem('Pentagon 128k', () => {
-            emu.setMachine('4');
-            emu.focus();
-        });
-        const displayMenu = ui.menuBar.addMenu('Display');
-
+        const displayMenu = ui.menuBar.addMenu('Display', 'display');
         const zoomItemsBySize = {
-            1: displayMenu.addItem('100%', () => {ui.setZoom(1); emu.focus();}),
-            2: displayMenu.addItem('200%', () => {ui.setZoom(2); emu.focus();}),
-            3: displayMenu.addItem('300%', () => {ui.setZoom(3); emu.focus();}),
+            1: displayMenu.addItem('320x240', () => { ui.setZoom(1); emu.focus(); }),
+            2: displayMenu.addItem('640x480', () => { ui.setZoom(2); emu.focus(); }),
+            3: displayMenu.addItem('960x720', () => { ui.setZoom(3); emu.focus(); }),
         }
         const fullscreenItem = displayMenu.addItem('Fullscreen', () => {
             ui.enterFullscreen();
         })
         const setZoomCheckbox = (factor) => {
             if (factor == 'fullscreen') {
-                fullscreenItem.setBullet();
+                fullscreenItem.setActive();
                 for (let i in zoomItemsBySize) {
-                    zoomItemsBySize[i].unsetBullet();
+                    zoomItemsBySize[i].unsetActive();
                 }
             } else {
-                fullscreenItem.unsetBullet();
+                fullscreenItem.unsetActive();
                 for (let i in zoomItemsBySize) {
                     if (parseInt(i) == factor) {
-                        zoomItemsBySize[i].setBullet();
+                        zoomItemsBySize[i].setActive();
                     } else {
-                        zoomItemsBySize[i].unsetBullet();
+                        zoomItemsBySize[i].unsetActive();
                     }
                 }
             }
@@ -543,38 +533,33 @@ window.JSSpeccyPlus = (container, opts) => {
         setZoomCheckbox(ui.zoom);
 
         emu.on('setMachine', (type) => {
-            if (type == '1') {
-                machine48Item.setBullet();
-                machine128Item.unsetBullet();
-                machine128esItem.unsetBullet();
-                machinePentagonItem.unsetBullet();
-            } else if (type == '2') {
-                machine48Item.unsetBullet();
-                machine128Item.setBullet();
-                machine128esItem.unsetBullet();
-                machinePentagonItem.unsetBullet();
-            } else if (type == '3') {
-                machine48Item.unsetBullet();
-                machine128Item.unsetBullet();
-                machine128esItem.setBullet();
-                machinePentagonItem.unsetBullet();
-            } else { // pentagon
-                machine48Item.unsetBullet();
-                machine128Item.unsetBullet();
-                machine128esItem.unsetBullet();
-                machinePentagonItem.setBullet();
+            // Update hardware menu
+            const hardwareMenu = document.getElementById("ui-bar-menu-hardware");
+            if (hardwareMenu.hasChildNodes()) {
+                var children = hardwareMenu.childNodes;
+                for (var i = 0; i < children.length; i++) {
+                    var button = children[i].firstChild;
+                    if (button.getAttribute('data-id') == type) {
+                        button.classList.add('active');
+                    } else {
+                        button.classList.remove('active');
+                    }
+                }
             }
+
+            // Update style class
+            // TODO
         });
 
         if (!opts.sandbox) {
-            ui.toolbar.addButton(openIcon, {label: 'Open file'}, () => {
+            ui.toolbar.addButton(openIcon, { label: 'Open file' }, () => {
                 openFileDialog();
             });
         }
-        ui.toolbar.addButton(resetIcon, {label: 'Reset'}, () => {
+        ui.toolbar.addButton(resetIcon, { label: 'Reset' }, () => {
             emu.reset();
         });
-        const pauseButton = ui.toolbar.addButton(playIcon, {label: 'Unpause'}, () => {
+        const pauseButton = ui.toolbar.addButton(playIcon, { label: 'Unpause' }, () => {
             if (emu.isRunning) {
                 emu.pause();
             } else {
@@ -589,7 +574,7 @@ window.JSSpeccyPlus = (container, opts) => {
             pauseButton.setIcon(pauseIcon);
             pauseButton.setLabel('Pause');
         });
-        const tapeButton = ui.toolbar.addButton(tapePlayIcon, {label: 'Start tape'}, () => {
+        const tapeButton = ui.toolbar.addButton(tapePlayIcon, { label: 'Start tape' }, () => {
             if (emu.tapeIsPlaying) {
                 emu.stopTape();
             } else {
@@ -611,7 +596,7 @@ window.JSSpeccyPlus = (container, opts) => {
 
         const fullscreenButton = ui.toolbar.addButton(
             fullscreenIcon,
-            {label: 'Enter full screen mode', align: 'right'},
+            { label: 'Enter full screen mode', align: 'right' },
             () => {
                 ui.toggleFullscreen();
             }
@@ -634,92 +619,8 @@ window.JSSpeccyPlus = (container, opts) => {
             emu.openFile(file).then(() => {
                 if (emu.isInitiallyPaused) emu.start();
                 emu.focus();
-            }).catch((err) => {alert(err);});
+            }).catch((err) => { alert(err); });
         });
-    }
-
-    const openGameBrowser = () => {
-        emu.pause();
-        const body = ui.showDialog();
-        body.innerHTML = `
-            <label>Find games</label>
-            <form>
-                <input type="search">
-                <button type="submit">Search</button>
-            </form>
-            <div class="results">
-            </div>
-        `;
-        const input = body.querySelector('input');
-        const searchButton = body.querySelector('button');
-        const searchForm = body.querySelector('form');
-        const resultsContainer = body.querySelector('.results');
-
-        searchForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            searchButton.innerText = 'Searching...';
-            const searchTerm = input.value.replace(/[^\w\s\-\']/, '');
-
-            const encodeParam = (key, val) => {
-                return encodeURIComponent(key) + '=' + encodeURIComponent(val);
-            }
-
-            const searchUrl = (
-                'https://archive.org/advancedsearch.php?'
-                + encodeParam('q', 'collection:softwarelibrary_zx_spectrum title:"' + searchTerm + '"')
-                + '&' + encodeParam('fl[]', 'creator')
-                + '&' + encodeParam('fl[]', 'identifier')
-                + '&' + encodeParam('fl[]', 'title')
-                + '&' + encodeParam('rows', '50')
-                + '&' + encodeParam('page', '1')
-                + '&' + encodeParam('output', 'json')
-            )
-            fetch(searchUrl).then(response => {
-                searchButton.innerText = 'Search';
-                return response.json();
-            }).then(data => {
-                resultsContainer.innerHTML = '<ul></ul><p>- powered by <a href="https://archive.org/">Internet Archive</a></p>';
-                const ul = resultsContainer.querySelector('ul');
-                const results = data.response.docs;
-                results.forEach(result => {
-                    const li = document.createElement('li');
-                    ul.appendChild(li);
-                    const resultLink = document.createElement('a');
-                    resultLink.href = '#';
-                    resultLink.innerText = result.title;
-                    const creator = document.createTextNode(' - ' + result.creator)
-                    li.appendChild(resultLink);
-                    li.appendChild(creator);
-                    resultLink.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        fetch(
-                            'https://archive.org/metadata/' + result.identifier
-                        ).then(response => response.json()).then(data => {
-                            let chosenFilename = null;
-                            data.files.forEach(file => {
-                                const ext = file.name.split('.').pop().toLowerCase();
-                                if (ext == 'z80' || ext == 'sna' || ext == 'tap' || ext == 'tzx' || ext == 'szx') {
-                                    chosenFilename = file.name;
-                                }
-                            });
-                            if (!chosenFilename) {
-                                alert('No loadable file found');
-                            } else {
-                                const finalUrl = 'https://cors.archive.org/cors/' + result.identifier + '/' + chosenFilename;
-                                emu.openUrl(finalUrl).catch((err) => {
-                                    alert(err);
-                                }).then(() => {
-                                    ui.hideDialog();
-                                    emu.focus();
-                                    emu.start();
-                                });
-                            }
-                        })
-                    })
-                })
-            })
-        })
-        input.focus();
     }
 
     const exit = () => {
@@ -728,14 +629,14 @@ window.JSSpeccyPlus = (container, opts) => {
     }
 
     return {
-        setZoom: (zoom) => {ui.setZoom(zoom);},
-        toggleFullscreen: () => {ui.toggleFullscreen();},
-        enterFullscreen: () => {ui.enterFullscreen();},
-        exitFullscreen: () => {ui.exitFullscreen();},
-        setMachine: (model) => {emu.setMachine(model);},
-        openFileDialog: () => {openFileDialog();},
+        setZoom: (zoom) => { ui.setZoom(zoom); },
+        toggleFullscreen: () => { ui.toggleFullscreen(); },
+        enterFullscreen: () => { ui.enterFullscreen(); },
+        exitFullscreen: () => { ui.exitFullscreen(); },
+        setMachine: (model) => { emu.setMachine(model); },
+        openFileDialog: () => { openFileDialog(); },
         openUrl: (url) => {
-            emu.openUrl(url).catch((err) => {alert(err);});
+            emu.openUrl(url).catch((err) => { alert(err); });
         },
         loadSnapshotFromStruct: (snapshot) => {
             emu.loadSnapshot(snapshot);
@@ -747,6 +648,6 @@ window.JSSpeccyPlus = (container, opts) => {
                 emu.onReadyHandlers.push(callback);
             }
         },
-        exit: () => {exit();},
+        exit: () => { exit(); },
     };
 };

@@ -1,3 +1,20 @@
+Plus 1.0 (2024-01-01)
+---------------------
+* Added "Inves Spectrum 128k" spanish clone to emulable machines -> PROCCESS
+* Enhanced & Responsive UI -> PROCCESS
+* Load in memory only current machine roms -> TODO, me simpificaría bastante el añadir otras maquinas posteriormente.
+* Add credit modal-> TODO
+* UI translation based on lang files. Lang detection from navigator. If no translation present, fallbacks to EN -> TODO
+* Added Mute/Unmute button to footer toolbar
+* Guardar/Cargar partidas. Ya sea mediante archivo o haciendo uso de localstorage. -> TODO
+* On screen keyboard ?
+* ScriptProcessorNode is deprecated. Use AudioWorkletNode instead. -> TODO
+* Joysticks support?
+* Gestión de maquinas -> Array que almacene toda la info necesaria de cada maquina, para agilizar el alta de nuevas maquinas.
+* Gestión de ROMS -> Cargar en memoria solo las de la maquina seleccionada. Esto libera muchas paginas reservadas a ROMS no usadas.
+* Gestión de RAM -> Aumentar la memoria hasta 512k para dar soporte a nuevas maquinas. Esto conlleva que las paginas 0-15 seran para RAM y 16-20 para carga de ROMS
+
+
 3.1 (2021-08-26)
 ----------------
 

@@ -1,11 +1,99 @@
-// Variables - Colors
-$canvas-bg-color: #ffffff;
-$ui-bars-bg-color: #1b1919;
-
-// Variables - fonts
+// Variables
 $primary-font-family: monospace;
+$font-size: 13px;
+$container-bg-color: #e5e5e5;
+$ui-bars-bg-color: #1b1919;
+$ui-bars-button-color: #fff;
+$ui-bars-button-bg-color: #444;
+$ui-bars-button-bg-hover-color: #575656;
+$ui-bars-border-radius: 5px;
+$ui-bars-margin: 5px;
+$ui-bars-padding: 5px;
 
-div.jsspeccyplus-ui-bar {
-  background-color: $ui-bars-bg-color;
-  font-family:$primary-font-family;
+// UI styling
+
+.jsspeccyplus-container {
+  background-color: $container-bg-color;
+
+  div.jsspeccyplus-ui-bar,
+  div.jsspeccyplus-ui-toolbar {
+    background-color: $ui-bars-bg-color;
+    padding: $ui-bars-padding 0px;
+
+    &>div>button,
+    &>button {
+      background-color: $ui-bars-button-bg-color;
+      border: 0;
+      border-radius: $ui-bars-border-radius;
+      color: $ui-bars-button-color;
+      font-family: $primary-font-family;
+      font-size: 12px;
+      font-weight: bold;
+      margin: 0px $ui-bars-margin;
+      padding: $ui-bars-padding;
+
+      &:hover {
+        background-color: $ui-bars-button-bg-hover-color;
+        cursor: pointer;
+      }
+    }
+
+    &>div {
+      float: left;
+      position: relative;
+
+      &>ul {
+        background-color: #fff;
+        border: 3px solid #000;
+        border-radius: 0;
+        color: #000;
+        list-style-type: none;
+        margin: 10px $ui-bars-margin;
+        padding: 0px;
+        position: absolute;
+        width: 400px;
+
+        li {
+          button {
+            background-color: transparent;
+            border: 0;
+            border-radius: 0;
+            color: #000;
+            font-family: $primary-font-family;
+            font-size: 12px;
+            font-weight: bold;
+            padding: $ui-bars-padding;
+            text-align: left;
+            width: 100%;
+            cursor: pointer;
+
+            &.active {
+              background-color: #50E0FF;
+            }
+          }
+
+          &:hover {
+            background-color: #a6ecfc;
+          }
+        }
+      }
+    }
+  }
+
+  div.jsspeccyplus-ui-bar {
+    background-image: url('images/zx-spectrum-ui-bar-logo.svg');
+    background-position: right center;
+    background-repeat: no-repeat;
+  }
+
+  div.jsspeccyplus-ui-toolbar {
+    bottom: 0px;
+    width: 100%;
+
+    &>button {
+      svg {
+        fill: #fff;
+      }
+    }
+  }
 }

@@ -10,14 +10,15 @@ export class MenuBar {
         this.elem.style.display = 'flow-root';
         this.elem.style.top = '0';
         this.elem.style.width = '100%';
+        this.elem.id = 'jsspeccyplus-ui-bar';
         this.elem.classList.add('jsspeccyplus-ui-bar');
         container.appendChild(this.elem);
         this.currentMouseenterEvent = null;
         this.currentMouseoutEvent = null;
     }
 
-    addMenu(title) {
-        return new Menu(this.elem, title);
+    addMenu(title, type) {
+        return new Menu(this.elem, title, type);
     }
 
     enterFullscreen() {
@@ -53,26 +54,15 @@ export class MenuBar {
 }
 
 export class Menu {
-    constructor(container, title) {
+    constructor(container, title, type) {
         const elem = document.createElement('div');
-        elem.style.float = 'left';
-        elem.style.position = 'relative';
         container.appendChild(elem);
-
         const button = document.createElement('button');
-        button.style.margin = '2px';
         button.innerText = title;
         elem.appendChild(button);
-
         this.list = document.createElement('ul');
-        this.list.style.position = 'absolute';
-        this.list.style.width = '150px';
-        this.list.style.backgroundColor = '#eee';
-        this.list.style.listStyleType = 'none';
-        this.list.style.margin = '0';
-        this.list.style.padding = '0';
-        this.list.style.border = '1px solid #888';
         this.list.style.display = 'none';
+        this.list.id = 'ui-bar-menu-'+type;
         elem.appendChild(this.list);
 
         button.addEventListener('click', () => {
@@ -99,41 +89,26 @@ export class Menu {
         this.list.style.display = 'none';
     }
 
-    addItem(title, onClick) {
+    addItem(title, onClick, machineId = false) {
         const li = document.createElement('li');
         this.list.appendChild(li);
         const button = document.createElement('button');
+        if (machineId) {
+            button.setAttribute('data-id', machineId);
+        }
         button.innerText = title;
-        button.style.width = '100%';
-        button.style.textAlign = 'left';
-        button.style.borderWidth = '0';
-        button.style.paddingTop = '4px';
-        button.style.paddingBottom = '4px';
 
-        // eww.
-        button.addEventListener('mouseenter', () => {
-            button.style.backgroundColor = '#ddd';
-        });
-        button.addEventListener('mouseout', () => {
-            button.style.backgroundColor = 'inherit';
-        });
         if (onClick) {
             button.addEventListener('click', onClick);
         }
         li.appendChild(button);
         return {
-            setBullet: () => {
-                button.innerText = String.fromCharCode(0x2022) + ' ' + title;
+            setActive: () => {
+                button.classList.add("active");
             },
-            unsetBullet: () => {
-                button.innerText = title;
-            },
-            setCheckbox: () => {
-                button.innerText = String.fromCharCode(0x2713) + ' ' + title;
-            },
-            unsetCheckbox: () => {
-                button.innerText = title;
-            },
+            unsetActive: () => {
+                button.classList.remove("active");
+            }
         }
     }
 }
@@ -141,9 +116,7 @@ export class Menu {
 export class Toolbar {
     constructor(container) {
         this.elem = document.createElement('div');
-        this.elem.style.backgroundColor = '#ccc';
-        this.elem.style.bottom = '0';
-        this.elem.style.width = '100%';
+        this.elem.classList.add('jsspeccyplus-ui-toolbar');
         container.appendChild(this.elem);
         this.currentMouseenterEvent = null;
         this.currentMouseoutEvent = null;
@@ -190,7 +163,6 @@ export class Toolbar {
 class ToolbarButton {
     constructor(icon, opts, onClick) {
         this.elem = document.createElement('button');
-        this.elem.style.margin = '2px';
         this.setIcon(icon);
         if (opts.label) this.setLabel(opts.label);
         this.elem.addEventListener('click', onClick);
@@ -303,7 +275,7 @@ export class UIController extends EventEmitter {
             }
             this.showUI();
             if (this.hideUITimeout) clearTimeout(this.hideUITimeout);
-            this.hideUITimeout = setTimeout(() => {this.hideUI();}, 3000);
+            this.hideUITimeout = setTimeout(() => { this.hideUI(); }, 3000);
         }
         this.appContainer.addEventListener('fullscreenchange', () => {
             if (document.fullscreenElement) {
@@ -317,12 +289,12 @@ export class UIController extends EventEmitter {
                     this.ignoreNextMouseMove = true;
 
                     this.menuBar.enterFullscreen();
-                    this.menuBar.onmouseenter(() => {this.allowUIHiding = false;});
-                    this.menuBar.onmouseout(() => {this.allowUIHiding = true;});
+                    this.menuBar.onmouseenter(() => { this.allowUIHiding = false; });
+                    this.menuBar.onmouseout(() => { this.allowUIHiding = true; });
 
                     this.toolbar.enterFullscreen();
-                    this.toolbar.onmouseenter(() => {this.allowUIHiding = false;});
-                    this.toolbar.onmouseout(() => {this.allowUIHiding = true;});
+                    this.toolbar.onmouseenter(() => { this.allowUIHiding = false; });
+                    this.toolbar.onmouseout(() => { this.allowUIHiding = true; });
 
                     this.hideUI();
                 }
@@ -394,7 +366,8 @@ export class UIController extends EventEmitter {
         const displayHeight = 240 * this.zoom;
         this.canvas.style.width = '' + displayWidth + 'px';
         this.canvas.style.height = '' + displayHeight + 'px';
-        this.appContainer.style.width = '' + displayWidth + 'px';
+        this.canvas.style.margin = 'auto';
+        //this.appContainer.style.width = '' + displayWidth + 'px';
         this.emit('setZoom', factor);
     }
 
