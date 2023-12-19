@@ -1,10 +1,10 @@
 export default [
     {
         output: {
-            filename: 'jsspeccyplus/jsspeccyplus.js',
+            filename: 'js8bits/js8bits.js',
         },
-        name: 'jsspeccyplus',
-        entry: './runtime/jsspeccyplus.js',
+        name: 'js8bits',
+        entry: './runtime/js8bits.js',
         mode: 'production',
         module: {
             rules: [
@@ -17,10 +17,10 @@ export default [
     },
     {
         output: {
-            filename: 'jsspeccyplus/jsspeccyplus-worker.js',
+            filename: 'js8bits/zxspectrum-worker.js',
         },
-        name: 'worker',
-        entry: './runtime/worker.js',
+        name: 'zxspectrum-worker',
+        entry: './runtime/zxspectrum_worker.js',
         mode: 'production',
     },
 ];

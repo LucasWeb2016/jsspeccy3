@@ -1,8 +1,8 @@
 {
-  "name": "jsspeccy",
-  "version": "3.1.0",
-  "description": "a ZX Spectrum emulator in the browser",
-  "main": "jsspeccy.js",
+  "name": "js8bits",
+  "version": "1.0.0",
+  "description": "8bits computers emulator in the browser!",
+  "main": "js8bits.js",
   "type": "module",
   "scripts": {
     "test": "npm run build && node --experimental-wasm-modules test/test.js test/tests.in test/tests.expected",
@@ -10,7 +10,7 @@
     "build:wasm:debug": "asc build/core.ts --target debug",
     "build:wasm:release": "asc build/core.ts --target release",
     "build:js": "set \"NODE_OPTIONS=--openssl-legacy-provider\" && webpack",
-    "build:css": "sass scss/jsspeccyplus.scss dist/jsspeccyplus/jsspeccyplus.css",
+    "build:css": "sass scss/js8bits.scss dist/js8bits/js8bits.css",
     "build": "npm run build:core && npm run build:wasm:debug && npm run build:js && npm run build:css",
     "build:release": "npm run build:core && npm run build:wasm:release && npm run build:js && npm run build:css",
     "watch": "npm-watch"

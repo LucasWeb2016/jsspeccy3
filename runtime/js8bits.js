@@ -1,6 +1,3 @@
-/* ARCHIVO DE ENTRADA DEL PROYECTO */
-
-/* IMPORTS -> TODO Revisar linea a linea */
 import EventEmitter from 'events';
 import fileDialog from 'file-dialog';
 import JSZip from 'jszip';
@@ -27,104 +24,98 @@ const scriptUrl = document.currentScript.src;
 
 class Emulator extends EventEmitter {
     constructor(canvas, opts) {
-        super(); // Llama al constructor de la clase extendida "EventEmitter"
-        this.canvas = canvas; // Almacena canvas recibido
-        this.worker = new Worker(new URL('jsspeccyplus-worker.js', scriptUrl)); // Inicializa el worker
-        this.keyboardEnabled = ('keyboardEnabled' in opts) ? opts.keyboardEnabled : true; // Comprueba si el teclado debe estar activo o no. Por defecto si.
+        super();
+        this.canvas = canvas;
+        this.worker = new Worker(new URL(opts.worker, scriptUrl));
+        this.keyboardEnabled = ('keyboardEnabled' in opts) ? opts.keyboardEnabled : true;
         if (this.keyboardEnabled) {
-            this.keyboardHandler = new KeyboardHandler(this.worker, opts.keyboardEventRoot || document); // Como el teclado está activo, inicia el control de teclado
+            this.keyboardHandler = new KeyboardHandler(this.worker, opts.keyboardEventRoot || document);
         }
-        this.displayHandler = new DisplayHandler(this.canvas); // Inicia el control de Display
-        this.audioHandler = new AudioHandler(); // Inicia el control de sonido
-        this.isRunning = false; // Por defecto la maquina no está activa
-        this.isReady = false; // Por defecto la maquina no está inicialiada
-        this.isInitiallyPaused = (!opts.autoStart); // Autoarranque bool
-        this.autoLoadTapes = opts.autoLoadTapes || false; // Carga automatica de cintas bool
-        this.tapeAutoLoadMode = opts.tapeAutoLoadMode || 'default';  // tipo de carga 'default' o recibida por parametro
-        this.tapeIsPlaying = false; // Define si se esta reproduciendo o no una cinta bool. falso por defecto.
-        this.tapeTrapsEnabled = ('tapeTrapsEnabled' in opts) ? opts.tapeTrapsEnabled : true; // ???
-        this.supportedMachines = new SupportedMachines().getList(); // Obtiene listado de maquinas compatibles
+        this.displayHandler = new DisplayHandler(this.canvas);
+        this.audioHandler = new AudioHandler();
+        this.isRunning = false;
+        this.isReady = false;
+        this.isInitiallyPaused = (!opts.autoStart);
+        this.autoLoadTapes = opts.autoLoadTapes || false;
+        this.tapeAutoLoadMode = opts.tapeAutoLoadMode || 'default';
+        this.tapeIsPlaying = false;
+        this.tapeTrapsEnabled = ('tapeTrapsEnabled' in opts) ? opts.tapeTrapsEnabled : true;
+        this.supportedMachines = new SupportedMachines();
 
-        this.msPerFrame = 20; // Milisegundos por frame
-        // Un segundo son 1000 milisegundos
-        // 1000 / 20 = 50 frames por segundo
-        // Entiendo por tanto que la frecuencia de refresco del front respecto al worker es esta ????
+        this.msPerFrame = 20;
 
-        this.isExecutingFrame = false; // Define si se esta ejecutando o no un frame actualmente . bool
-        this.nextFrameTime = null; // Almacena tiempo hasta el siguiente frame ???
-        this.machineType = null; // Tipo de maquina por defecto null
+        this.isExecutingFrame = false;
+        this.nextFrameTime = null;
+        this.machineType = null;
 
         this.nextFileOpenID = 0;
         this.fileOpenPromiseResolutions = {};
 
         this.onReadyHandlers = [];
 
-        this.worker.onmessage = (e) => { // Procesa los postmessages recibidos del worker
+        this.worker.onmessage = (e) => {
             switch (e.data.message) {
-                case 'ready': // El worker está disponible
+                case 'ready':
                     console.log('WORKER - READY');
-                    this.loadRoms(opts.machine || '2').then(() => { // Carga las roms (Todas, todos sistemas), y a continuacion
-                        this.setMachine(opts.machine || '2'); // Maquina recibida por parametro o 128 por defecto
-                        this.setTapeTraps(this.tapeTrapsEnabled); // Setea las trampas de casette?
-                        if (opts.openUrl) { // Comprueba si se ha recibido URL de algun software
-                            this.openUrlList(opts.openUrl).catch(err => { // En caso afirmativo carga la URL
+                    this.loadRoms(opts.machine || '1').then(() => {
+                        this.setMachine(opts.machine || '1');
+                        this.setTapeTraps(this.tapeTrapsEnabled);
+                        if (opts.openUrl) {
+                            this.openUrlList(opts.openUrl).catch(err => {
                                 alert(err);
                             }).then(() => {
-                                if (opts.autoStart) this.start(); // Si todo ha ido OK y está el autostart en true, inicia la maquina.
+                                if (opts.autoStart) this.start();
                             });
                         } else if (opts.autoStart) {
-                            this.start(); // Si está el autostart en true, inicia la maquina.
+                            this.start();
                         }
 
-                        this.isReady = true; // Marca como ready
+                        this.isReady = true;
                         console.log(this.onReadyHandlers);
-                        for (let i = 0; i < this.onReadyHandlers.length; i++) {// Aqui por ahora no hay nada, revisar.
+                        for (let i = 0; i < this.onReadyHandlers.length; i++) {
                             this.onReadyHandlers[i]();
                         }
                         console.log(this.onReadyHandlers);
 
                     });
                     break;
-                case 'frameCompleted': // Se ha completado un frame y nos informa para que lo carguemos en canvas
-                    // benchmarkRunCount++;
+                case 'frameCompleted':
                     console.log('WORKER - FRAME COMPLETED');
-                    if ('audioBufferLeft' in e.data) { // Si hay audio, lo procesa
+                    if ('audioBufferLeft' in e.data) {
                         this.audioHandler.frameCompleted(e.data.audioBufferLeft, e.data.audioBufferRight);
                     }
 
-                    this.displayHandler.frameCompleted(e.data.frameBuffer); // Actualiza el display
-                    if (this.isRunning) { // Si esta funcionando?
-                        const time = performance.now(); // Get current execution time
-                        if (time > this.nextFrameTime) { // Si es mayor que el tiempo para el proximo frame
-                            /* running at full blast - start next frame but adjust time base
-                            to give it the full time allocation */
-                            this.runFrame(); // corre el frame
-                            this.nextFrameTime = time + this.msPerFrame; // Define el tiempo para el siguiente frame (actual + 20ms)
+                    this.displayHandler.frameCompleted(e.data.frameBuffer);
+                    if (this.isRunning) {
+                        const time = performance.now();
+                        if (time > this.nextFrameTime) {
+                            this.runFrame();
+                            this.nextFrameTime = time + this.msPerFrame;
                         } else {
-                            this.isExecutingFrame = false; // Debe ejecutarse el frame? false
+                            this.isExecutingFrame = false;
                         }
                     } else {
-                        this.isExecutingFrame = false; // Debe ejecutarse el frame? false
+                        this.isExecutingFrame = false;
                     }
                     break;
-                case 'fileOpened': // Se ha abierto un archivo
+                case 'fileOpened':
                     console.log('WORKER - FILE OPENED');
-                    if (e.data.mediaType == 'tape' && this.autoLoadTapes) { // Si es del tipo tape y esta configurado para que cargue automaticamente
+                    if (e.data.mediaType == 'tape' && this.autoLoadTapes) {
                         let tapeLoaders = {};
-                        const temp = this.supportedMachines;
+                        const temp = this.supportedMachines.getList();
                         Object.keys(temp).forEach(function (item) {
                             tapeLoaders[item] = { 'default': temp[item]['tape'], 'usr0': temp[item]['tape_usr0'] };
                         });
                         this.openUrl(new URL(tapeLoaders[this.machineType][this.tapeAutoLoadMode], scriptUrl));
                         if (!this.tapeTrapsEnabled) {
-                            this.playTape(); // Si no estan habilitadas las trampas de carga, reproduce la cinta.
+                            this.playTape();
                         }
                     }
-                    this.fileOpenPromiseResolutions[e.data.id]({ // Almacena el tipo de archivo que ha cargado ??
+                    this.fileOpenPromiseResolutions[e.data.id]({
                         mediaType: e.data.mediaType,
                     });
                     if (e.data.mediaType == 'tape') {
-                        this.emit('openedTapeFile'); //
+                        this.emit('openedTapeFile');
                     }
                     break;
                 case 'playingTape':
@@ -197,18 +188,19 @@ class Emulator extends EventEmitter {
         });
     }
 
-    async loadRoms(machineId) {
-        const supportedMachine = this.supportedMachines[machineId];
-        // rom0
-        await this.loadRom(supportedMachine['rom0'], supportedMachine['rom0_page']);
-        // rom1
-        if (supportedMachine['rom1']) {
-            await this.loadRom(supportedMachine['rom1'], supportedMachine['rom1_page']);
+    async loadRoms(type) {
+        const romsToLoad = this.supportedMachines.getRomsByMachine(type);
+        await this.loadRom(romsToLoad['rom0'], romsToLoad['rom0_page']);
+        if (typeof romsToLoad['rom1'] !== 'undefined' && romsToLoad['rom1']) {
+            await this.loadRom(romsToLoad['rom1'], romsToLoad['rom1_page']);
         }
-        // rom2
-        if (supportedMachine['rom2']) {
-            await this.loadRom(supportedMachine['rom2'], supportedMachine['rom2_page']);
+        if (typeof romsToLoad['rom2'] !== 'undefined' && romsToLoad['rom2']) {
+            await this.loadRom(romsToLoad['rom2'], romsToLoad['rom2_page']);
         }
+        // Future !
+        // if (typeof romsToLoad['romN'] !== 'undefined' && romsToLoad['romN']) {
+        //     await this.loadRom(romsToLoad['romN'], romsToLoad['romN_page']);
+        // }
     }
 
     runFrame() {
@@ -419,30 +411,31 @@ class Emulator extends EventEmitter {
     }
 }
 
-window.JSSpeccyPlus = (container, opts) => {
-    // let benchmarkRunCount = 0;
-    // let benchmarkRenderCount = 0;
+window.js8bits = (container, opts) => {
     opts = opts || {};
 
-    container.classList.add('jsspeccyplus-container');
+    container.classList.add('js8bits-container');
 
     const canvas = document.createElement('canvas');
     canvas.width = 320;
     canvas.height = 240;
-    const supportedMachines = new SupportedMachines().getList();
+
+    const supportedMachines = new SupportedMachines();
 
     const keyboardEnabled = ('keyboardEnabled' in opts) ? opts.keyboardEnabled : true;
     const uiEnabled = ('uiEnabled' in opts) ? opts.uiEnabled : true;
 
     const emu = new Emulator(canvas, {
-        machine: opts.machine || '2',
+        machine: opts.machine || '1',
         autoStart: opts.autoStart || false,
         autoLoadTapes: opts.autoLoadTapes || false,
         tapeAutoLoadMode: opts.tapeAutoLoadMode || 'default',
         openUrl: opts.openUrl,
-        tapeTrapsEnabled: ('tapeTrapsEnabled' in opts) ? opts.tapeTrapsEnabled : true,
+        tapeTrapsEnabled: ('tapeTrapsEnabled' in opts) ? opts.tapeTrapsEnabled : false,
         keyboardEnabled: keyboardEnabled,
+        worker: supportedMachines.getList()[opts.machine || '1']['worker'],
     });
+
     const ui = new UIController(container, emu, {
         zoom: opts.zoom || 1,
         sandbox: opts.sandbox,
@@ -458,13 +451,13 @@ window.JSSpeccyPlus = (container, opts) => {
 
     if (uiEnabled) {
         const machineMenu = ui.menuBar.addMenu('Hardware', 'hardware');
-        // One menu item for each supported machine
-        Object.keys(supportedMachines).forEach(function (item) {
-            const fullTitle = supportedMachines[item]['title']+'('+supportedMachines[item]['lang']+')('+supportedMachines[item]['country']+' '+supportedMachines[item]['year']+' - '+supportedMachines[item]['manufacturer']+')';
-            const machineItem = machineMenu.addItem(fullTitle, () => {
-                emu.setMachine(item);
+        const machineItem = machineMenu.addDataHeader();
+        const orderedMachines = supportedMachines.getOrderedList();
+        Object.keys(orderedMachines).forEach(function (item) {
+            const machineItem = machineMenu.addDataItem(orderedMachines[item], () => {
+                emu.setMachine(orderedMachines[item]['id']);
                 emu.focus();
-            }, item);
+            }, orderedMachines[item]['id']);
         });
 
         const fileMenu = ui.menuBar.addMenu('Software', 'software');
@@ -487,7 +480,7 @@ window.JSSpeccyPlus = (container, opts) => {
             updateAutoLoadTapesCheckbox();
         }
 
-        const tapeTrapsMenuItem = fileMenu.addItem('Instant tape loading', () => {
+        const tapeTrapsMenuItem = fileMenu.addItem('Fast tape loading', () => {
             emu.setTapeTraps(!emu.tapeTrapsEnabled);
             emu.focus();
         });
@@ -534,7 +527,7 @@ window.JSSpeccyPlus = (container, opts) => {
 
         emu.on('setMachine', (type) => {
             // Update hardware menu
-            const hardwareMenu = document.getElementById("ui-bar-menu-hardware");
+            const hardwareMenu = document.getElementById('ui-bar-menu-hardware');
             if (hardwareMenu.hasChildNodes()) {
                 var children = hardwareMenu.childNodes;
                 for (var i = 0; i < children.length; i++) {
@@ -547,25 +540,26 @@ window.JSSpeccyPlus = (container, opts) => {
                 }
             }
 
-            // Update style class
-            // TODO
+            var stylesArray = supportedMachines.getStyles();
+            container.classList.remove(...stylesArray);
+            container.classList.add(supportedMachines.getList()[type]['style']);
         });
 
         if (!opts.sandbox) {
-            ui.toolbar.addButton(openIcon, { label: 'Open file' }, () => {
+            ui.toolbar.addButton({ label: 'Open file' }, () => {
                 openFileDialog();
-            });
+            }, openIcon);
         }
-        ui.toolbar.addButton(resetIcon, { label: 'Reset' }, () => {
+        ui.toolbar.addButton({ label: 'Reset' }, () => {
             emu.reset();
-        });
-        const pauseButton = ui.toolbar.addButton(playIcon, { label: 'Unpause' }, () => {
+        }, resetIcon);
+        const pauseButton = ui.toolbar.addButton({ label: 'Unpause' }, () => {
             if (emu.isRunning) {
                 emu.pause();
             } else {
                 emu.start();
             }
-        });
+        }, playIcon);
         emu.on('pause', () => {
             pauseButton.setIcon(playIcon);
             pauseButton.setLabel('Unpause');
@@ -574,13 +568,28 @@ window.JSSpeccyPlus = (container, opts) => {
             pauseButton.setIcon(pauseIcon);
             pauseButton.setLabel('Pause');
         });
-        const tapeButton = ui.toolbar.addButton(tapePlayIcon, { label: 'Start tape' }, () => {
+        const fullscreenButton = ui.toolbar.addButton(
+            { label: 'Enter full screen mode' },
+            () => {
+                ui.toggleFullscreen();
+            }, fullscreenIcon
+        )
+        ui.on('setZoom', (factor) => {
+            if (factor == 'fullscreen') {
+                fullscreenButton.setIcon(exitFullscreenIcon);
+                fullscreenButton.setLabel('Exit full screen mode');
+            } else {
+                fullscreenButton.setIcon(fullscreenIcon);
+                fullscreenButton.setLabel('Enter full screen mode');
+            }
+        });
+        const tapeButton = ui.toolbar.addButton({ label: 'Start tape' }, () => {
             if (emu.tapeIsPlaying) {
                 emu.stopTape();
             } else {
                 emu.playTape();
             }
-        });
+        }, tapePlayIcon);
         tapeButton.disable();
         emu.on('openedTapeFile', () => {
             tapeButton.enable();
@@ -592,24 +601,6 @@ window.JSSpeccyPlus = (container, opts) => {
         emu.on('stoppedTape', () => {
             tapeButton.setIcon(tapePlayIcon);
             tapeButton.setLabel('Start tape');
-        });
-
-        const fullscreenButton = ui.toolbar.addButton(
-            fullscreenIcon,
-            { label: 'Enter full screen mode', align: 'right' },
-            () => {
-                ui.toggleFullscreen();
-            }
-        )
-
-        ui.on('setZoom', (factor) => {
-            if (factor == 'fullscreen') {
-                fullscreenButton.setIcon(exitFullscreenIcon);
-                fullscreenButton.setLabel('Exit full screen mode');
-            } else {
-                fullscreenButton.setIcon(fullscreenIcon);
-                fullscreenButton.setLabel('Enter full screen mode');
-            }
         });
     }
 

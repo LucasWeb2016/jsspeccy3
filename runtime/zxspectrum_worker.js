@@ -14,7 +14,7 @@ let tapeIsPlaying = false;
 
 const loadCore = (baseUrl) => {
     WebAssembly.instantiateStreaming(
-        fetch(new URL('jsspeccyplus-core.wasm', baseUrl), {})
+        fetch(new URL('js8bits-core.wasm', baseUrl), {})
     ).then(results => {
         core = results.instance.exports;
         memory = core.memory;

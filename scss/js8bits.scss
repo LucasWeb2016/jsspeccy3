@@ -1,0 +1,445 @@
+// Variables
+$primary-font-family: monospace;
+$font-size: 13px;
+$container-bg-color: #e5e5e5;
+$ui-bars-button-color: #fff;
+$ui-bars-button-bg-color: #444;
+$ui-bars-button-bg-hover-color: #575656;
+$ui-bars-border-radius: 5px;
+$ui-bars-margin: 5px;
+$ui-bars-padding: 5px;
+$ui-back-plastic-bg : #1b1919;
+$ui-grey-plastic-bg : #66676B;
+$ui-white-plastic-bg : #b1b1b1;
+
+// UI styling
+
+.js8bits-container {
+  background-color: $container-bg-color;
+  min-width: 250px;
+  position: relative;
+
+  div.js8bits-ui-bar,
+  div.js8bits-ui-toolbar {
+    background-color: $ui-back-plastic-bg;
+    padding: $ui-bars-padding 0px;
+
+    &>div>button,
+    &>button {
+      background-color: $ui-bars-button-bg-color;
+      border: 0;
+      border-radius: $ui-bars-border-radius;
+      color: $ui-bars-button-color;
+      font-family: $primary-font-family;
+      font-size: 12px;
+      font-weight: bold;
+      margin: 0px $ui-bars-margin;
+      padding: 7px;
+
+      &:hover {
+        background-color: $ui-bars-button-bg-hover-color;
+        cursor: pointer;
+      }
+    }
+
+    &>div {
+      display:inline;
+
+      &>ul {
+        background-color: #fff;
+        border: 3px solid #000;
+        border-radius: 0;
+        color: #000;
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+        position: absolute;
+        width: 200px;
+
+        li {
+          button {
+            background-color: transparent;
+            border: 0;
+            border-radius: 0;
+            color: #000;
+            cursor: pointer;
+            font-family: $primary-font-family;
+            font-size: 12px;
+            font-weight: bold;
+            padding: $ui-bars-padding;
+            text-align: left;
+            width: 100%;
+
+            &.active {
+              background-color: #50E0FF;
+            }
+          }
+
+          &:hover {
+            background-color: #a6ecfc;
+          }
+        }
+      }
+    }
+  }
+
+  div.js8bits-ui-bar {
+    background-image: url('images/spectrum48.webp');
+    background-position: right center;
+    background-repeat: no-repeat;
+    background-size: auto;
+    height: 30px;
+
+    ul#ui-bar-menu-hardware {
+      display: grid;
+      gap: 0;
+      grid-template-columns: repeat(10, auto);
+      overflow-x: auto;
+      overflow-y: auto;
+      z-index: 1;
+      top:40px;
+      left:0;
+
+      &>li {
+        cursor: pointer;
+        display: contents;
+
+        >div {
+          border-bottom: 1px solid #fff;
+          border-right: 1px solid #fff;
+          font-family: $primary-font-family;
+          font-size: $font-size;
+          padding: 3px 5px;
+
+          b.check-ok {
+            color: green;
+          }
+
+          b.check-ko {
+            color: red;
+          }
+
+          b.check-semi {
+            color: orange;
+          }
+        }
+
+        &.header {
+          >div {
+            background-color: #000;
+            color: #fff;
+            font-weight: bold;
+          }
+        }
+
+        &:not(.header):hover {
+          >div {
+            font-weight: bold;
+          }
+        }
+
+        &.unemulated {
+          >div {
+            background-color: #fbe7e7;
+            color: red;
+          }
+        }
+
+        &.emulated {
+          >div {
+            background-color: #e9fee9;
+            color: green;
+          }
+        }
+
+        &.partially {
+          >div {
+            background-color: #fff4df;
+            color: orange;
+          }
+        }
+
+      }
+    }
+  }
+
+  div.js8bits-ui-toolbar {
+    background-image: url('images/spectrum48-bottom.webp');
+    background-position: right center;
+    background-repeat: no-repeat;
+    background-size: auto;
+    bottom: 0px;
+    height: 34px;
+    width: 100%;
+
+    &>button {
+      svg {
+        fill: #fff;
+      }
+    }
+  }
+
+  // Investronica custom style
+  &.inves {
+    div.js8bits-ui-bar {
+      background-image: url('images/spectruminves.webp');
+    }
+
+    div.js8bits-ui-toolbar {
+      background-image: url('images/spectrum48-bottom.webp');
+    }
+  }
+
+  // ZX Spectrum 128+ custom style
+  &.spectrum128p {
+    div.js8bits-ui-bar {
+      background-image: url('images/spectrum128p.webp');
+    }
+
+    div.js8bits-ui-toolbar {
+      background-image: url('images/spectrum128p-bottom.webp');
+    }
+  }
+
+  // ZX Spectrum 128+2 custom style
+  &.spectrum128p2 {
+
+    div.js8bits-ui-bar,
+    div.js8bits-ui-toolbar {
+      background-color: $ui-grey-plastic-bg;
+
+      &>div>button,
+      &>button {
+        background-color: #828386;
+
+        &:hover {
+          background-color: $ui-bars-button-bg-hover-color;
+        }
+      }
+    }
+
+    div.js8bits-ui-bar {
+      background-image: url('images/spectrum128p2.webp');
+    }
+
+    div.js8bits-ui-toolbar {
+      background-image: url('images/spectrum128p-bottom.webp');
+    }
+  }
+
+  // byte clone custom style
+  &.byte {
+
+    div.js8bits-ui-bar,
+    div.js8bits-ui-toolbar {
+      background-color: $ui-grey-plastic-bg;
+
+      &>div>button,
+      &>button {
+        background-color: #000;
+
+        &:hover {
+          background-color: $ui-bars-button-bg-hover-color;
+        }
+      }
+    }
+
+    div.js8bits-ui-bar {
+      background-image: url('images/byte.webp');
+    }
+
+    div.js8bits-ui-toolbar {
+      background-image: url('images/byte-bottom.webp');
+
+      &>button {
+        svg {
+          fill: #fff;
+
+          >g {
+            stroke: #ccc !important;
+          }
+
+        }
+      }
+    }
+  }
+
+  // TC2048 custom style
+  &.tc2048 {
+
+    div.js8bits-ui-bar,
+    div.js8bits-ui-toolbar {
+      background-color: #3e3a3a;
+
+      &>div>button,
+      &>button {
+        background-color: #fff;
+        color: #000;
+
+        &:hover {
+          background-color: $ui-bars-button-bg-hover-color;
+        }
+      }
+    }
+
+    &>div {
+      &>ul {
+        li {
+          button {
+            &.active {
+              background-color: #53C6F3;
+            }
+          }
+
+          &:hover {
+            background-color: #89a4af;
+          }
+        }
+      }
+    }
+
+    div.js8bits-ui-bar {
+      background-image: url('images/tc2048.webp');
+    }
+
+    div.js8bits-ui-toolbar {
+      background-image: url('images/tc2048-bottom.webp');
+
+      &>button {
+        svg {
+          fill: #000;
+
+          >path {
+            >g {
+              >g {
+                stroke: #474747;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // TC2068 custom style
+  &.tc2068 {
+
+    div.js8bits-ui-bar,
+    div.js8bits-ui-toolbar {
+      background-color: #3e3a3a;
+
+      &>div>button,
+      &>button {
+        background-color: #fff;
+        color: #000;
+
+        &:hover {
+          background-color: $ui-bars-button-bg-hover-color;
+        }
+      }
+    }
+
+    &>div {
+      &>ul {
+        li {
+          button {
+            &.active {
+              background-color: #53C6F3;
+            }
+          }
+
+          &:hover {
+            background-color: #89a4af;
+          }
+        }
+      }
+    }
+
+    div.js8bits-ui-bar {
+      background-image: url('images/tc2068.webp');
+    }
+
+    div.js8bits-ui-toolbar {
+      background-image: url('images/tc2048-bottom.webp');
+
+      &>button {
+        svg {
+          fill: #000;
+
+          >path {
+            >g {
+              >g {
+                stroke: #474747;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // tk90x custom style
+  &.microdigitaltk90x {
+    div.js8bits-ui-bar {
+      background-image: url('images/tk90x.webp');
+    }
+
+    div.js8bits-ui-toolbar {
+      background-image: url('images/tk90x-bottom.webp');
+    }
+  }
+
+
+  // tk95 custom style
+  &.microdigitaltk95 {
+
+    div.js8bits-ui-bar,
+    div.js8bits-ui-toolbar {
+      background-color: #3e3a3a;
+
+      &>div>button,
+      &>button {
+        background-color: #699AAD;
+
+        &:hover {
+          background-color: $ui-bars-button-bg-hover-color;
+        }
+      }
+    }
+
+    &>div {
+      &>ul {
+        li {
+          button {
+            &.active {
+              background-color: #699AAD;
+            }
+          }
+
+          &:hover {
+            background-color: #89a4af;
+          }
+        }
+      }
+    }
+
+    div.js8bits-ui-bar {
+      background-image: url('images/tk95.webp');
+    }
+
+    div.js8bits-ui-toolbar {
+      background-image: url('images/tk95-bottom.webp');
+    }
+  }
+
+  // Common clone custom style
+  &.clone {
+    div.js8bits-ui-bar {
+      background-image: url('images/clone.webp');
+    }
+
+    div.js8bits-ui-toolbar {
+      background-image: url('images/spectrum48-bottom.webp');
+    }
+  }
+}

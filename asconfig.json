@@ -1,13 +1,13 @@
 {
   "targets": {
     "debug": {
-      "binaryFile": "dist/jsspeccyplus/jsspeccyplus-core.wasm",
+      "binaryFile": "dist/js8bits/js8bits-core.wasm",
       "textFile": "build/core.wat",
       "sourceMap": true,
       "debug": true
     },
     "release": {
-      "binaryFile": "dist/jsspeccyplus/jsspeccyplus-core.wasm",
+      "binaryFile": "dist/js8bits/js8bits-core.wasm",
       "textFile": "build/core.wat",
       "sourceMap": true,
       "optimizeLevel": 3,
