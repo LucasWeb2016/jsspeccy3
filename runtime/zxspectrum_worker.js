@@ -1,4 +1,5 @@
 import { FRAME_BUFFER_SIZE } from './constants.js';
+import { SupportedMachines } from './machines.js';
 import { TAPFile, TZXFile } from './tape.js';
 
 let core = null;
@@ -11,6 +12,8 @@ let tapePulses = null;
 let stopped = false;
 let tape = null;
 let tapeIsPlaying = false;
+
+const supportedMachines = new SupportedMachines();
 
 const loadCore = (baseUrl) => {
     WebAssembly.instantiateStreaming(
@@ -155,13 +158,13 @@ onmessage = (e) => {
                 switch (status) {
                     case 1:
                         stopped = true;
-                        throw("Unrecognised opcode!");
+                        throw ("Unrecognised opcode!");
                     case 2:
                         trapTapeLoad();
                         break;
                     default:
                         stopped = true;
-                        throw("runFrame returned unexpected result: " + status);
+                        throw ("runFrame returned unexpected result: " + status);
                 }
 
                 status = core.resumeFrame();
@@ -187,16 +190,28 @@ onmessage = (e) => {
                     frameBuffer,
                 }, [frameBuffer]);
             }
-
             break;
         case 'keyDown':
             core.keyDown(e.data.row, e.data.mask);
+            postMessage({
+                message: 'keyDown received',
+                row: e.data.row,
+                mask: e.data.mask,
+            });
             break;
         case 'keyUp':
             core.keyUp(e.data.row, e.data.mask);
+            postMessage({
+                message: 'keyUp received',
+                row: e.data.row,
+                mask: e.data.mask,
+            });
             break;
         case 'setMachineType':
-            core.setMachineType(e.data.type);
+            core.setMachineType(e.data.type, e.data.frameCycleCount, e.data.mainScreenStartTstate, e.data.tstatesPerRow, e.data.borderTimeMask, e.data.buildContentionTable, e.data.betadiskEnabled, e.data.betadiskROMActive, e.data.pagingLocked, e.data.memoryPageReadMap, e.data.isPentagonBased);
+            postMessage({
+                message: 'machineSetupDone',
+            });
             break;
         case 'reset':
             core.reset();
@@ -251,6 +266,9 @@ onmessage = (e) => {
             core.setTapeTraps(e.data.value);
             break;
         default:
-            console.log('message received by worker:', e.data);
+            postMessage({
+                message: 'error',
+                content: 'Message not recognized by Worker!'
+            });
     }
 };

@@ -1,0 +1,133 @@
+@import 'variables';
+
+.js8bits-container {
+  &.tc2048 {
+
+      div.js8bits-ui-bar,
+      div.js8bits-ui-toolbar {
+        background-color: #3e3a3a;
+
+        &>div>button,
+        &>button {
+          background-color: #fff;
+          color: #000;
+
+          &:hover {
+            background-color: $ui-bars-button-bg-hover-color;
+          }
+        }
+      }
+
+      &>div {
+        &>ul {
+          li {
+            button {
+              &.active {
+                background-color: #53C6F3;
+              }
+            }
+
+            &:hover {
+              background-color: #89a4af;
+            }
+          }
+        }
+      }
+
+      div.js8bits-ui-bar {
+        background-image: url('images/tc2048.webp');
+      }
+
+      div.js8bits-ui-toolbar {
+        background-image: url('images/tc2048-bottom.webp');
+
+        &>button {
+          svg {
+            fill: #000;
+
+            >path {
+              >g {
+                >g {
+                  stroke: #474747;
+                }
+              }
+            }
+          }
+        }
+      }
+
+      div.js8bits-ui-keyboard {
+
+        >div {
+
+          &>div.keyboard-row {
+
+            &>div {
+
+              &>div {
+
+                &.button-top2 {
+                  color: #fff;
+                }
+
+                &.button-inner {
+                  background-color: #fff;
+                  cursor: pointer;
+
+                  &>div.button-inner2 {
+                    color: #000;
+
+                    div.zx-key {
+                      background-color: #fff;
+                      height: 10px;
+                      position: relative;
+                      width: 10px;
+
+                      >span {
+                        background-color: #000;
+                        height: 4px;
+                        width: 4px;
+                      }
+
+                      &.seven {
+                        background: color #fff;
+                        border: 1px solid #000;
+
+                        >span {
+                          background-color: #000;
+                          bottom: 1px;
+                          left: 1px;
+                        }
+                      }
+                    }
+                  }
+
+                  &>div.button-inner3 {}
+
+                  &:hover {}
+                }
+
+                &.button-bottom {}
+              }
+
+              &.one-action-key {
+                &>div {
+                  &.button-inner {
+                    &>div.button-inner1 {}
+                  }
+                }
+              }
+            }
+
+            &.keyboard-row-3 {
+              background-color: white;
+
+              div.button-inner1 {
+                color: #ff0000;
+              }
+            }
+          }
+        }
+      }
+    }
+}

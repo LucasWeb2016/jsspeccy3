@@ -17,6 +17,7 @@ import fullscreenIcon from './icons/fullscreen.svg';
 import exitFullscreenIcon from './icons/exitfullscreen.svg';
 import tapePlayIcon from './icons/tape_play.svg';
 import tapePauseIcon from './icons/tape_pause.svg';
+import keyboardIcon from './icons/keyboard.svg';
 
 import { SupportedMachines } from './machines.js';
 
@@ -25,11 +26,14 @@ const scriptUrl = document.currentScript.src;
 class Emulator extends EventEmitter {
     constructor(canvas, opts) {
         super();
+        this.opts = opts;
         this.canvas = canvas;
         this.worker = new Worker(new URL(opts.worker, scriptUrl));
+        this.devMode = opts.devMode || false;
         this.keyboardEnabled = ('keyboardEnabled' in opts) ? opts.keyboardEnabled : true;
         if (this.keyboardEnabled) {
-            this.keyboardHandler = new KeyboardHandler(this.worker, opts.keyboardEventRoot || document);
+            this.keyboardHandler = new KeyboardHandler(this.worker, opts.keyboardEventRoot || document, 'default', this.devMode);
+            this.keyboardEventRoot = opts.keyboardEventRoot;
         }
         this.displayHandler = new DisplayHandler(this.canvas);
         this.audioHandler = new AudioHandler();
@@ -41,6 +45,7 @@ class Emulator extends EventEmitter {
         this.tapeIsPlaying = false;
         this.tapeTrapsEnabled = ('tapeTrapsEnabled' in opts) ? opts.tapeTrapsEnabled : true;
         this.supportedMachines = new SupportedMachines();
+        this.inScreenKeyboardBuffer = false;
 
         this.msPerFrame = 20;
 
@@ -56,9 +61,11 @@ class Emulator extends EventEmitter {
         this.worker.onmessage = (e) => {
             switch (e.data.message) {
                 case 'ready':
-                    console.log('WORKER - READY');
+                    if (this.devMode) console.log('WORKER MESSAGE - READY');
+
                     this.loadRoms(opts.machine || '1').then(() => {
                         this.setMachine(opts.machine || '1');
+
                         this.setTapeTraps(this.tapeTrapsEnabled);
                         if (opts.openUrl) {
                             this.openUrlList(opts.openUrl).catch(err => {
@@ -70,17 +77,18 @@ class Emulator extends EventEmitter {
                             this.start();
                         }
 
+                        if (this.keyboardEnabled) {
+                            this.keyboardHandler = new KeyboardHandler(this.worker, this.opts.keyboardEventRoot || document, this.supportedMachines.getList()[this.machineType]['tech']['keyboard'], this.devMode);
+                        }
+
                         this.isReady = true;
-                        console.log(this.onReadyHandlers);
                         for (let i = 0; i < this.onReadyHandlers.length; i++) {
                             this.onReadyHandlers[i]();
                         }
-                        console.log(this.onReadyHandlers);
-
                     });
                     break;
                 case 'frameCompleted':
-                    console.log('WORKER - FRAME COMPLETED');
+                    //if (this.devMode) console.log('WORKER MESSAGE - FRAME COMPLETED');
                     if ('audioBufferLeft' in e.data) {
                         this.audioHandler.frameCompleted(e.data.audioBufferLeft, e.data.audioBufferRight);
                     }
@@ -99,14 +107,14 @@ class Emulator extends EventEmitter {
                     }
                     break;
                 case 'fileOpened':
-                    console.log('WORKER - FILE OPENED');
+                    if (this.devMode) console.log('WORKER MESSAGE - FILE OPENED');
                     if (e.data.mediaType == 'tape' && this.autoLoadTapes) {
                         let tapeLoaders = {};
-                        const temp = this.supportedMachines.getList();
-                        Object.keys(temp).forEach(function (item) {
-                            tapeLoaders[item] = { 'default': temp[item]['tape'], 'usr0': temp[item]['tape_usr0'] };
-                        });
-                        this.openUrl(new URL(tapeLoaders[this.machineType][this.tapeAutoLoadMode], scriptUrl));
+                        const machinesList = this.supportedMachines.getList();
+                        tapeLoaders[this.machineType] = { 'default': machinesList[this.machineType]['tapeloaders']['default'], 'usr0': machinesList[this.machineType]['tapeloaders']['usr0'] };
+                        if (machinesList[this.machineType]['tapeloaders'][this.tapeAutoLoadMode]) {
+                            this.openUrl(new URL(tapeLoaders[this.machineType][this.tapeAutoLoadMode], scriptUrl));
+                        }
                         if (!this.tapeTrapsEnabled) {
                             this.playTape();
                         }
@@ -119,17 +127,23 @@ class Emulator extends EventEmitter {
                     }
                     break;
                 case 'playingTape':
-                    console.log('WORKER - PLAYING TAPE');
+                    if (this.devMode) console.log('WORKER MESSAGE - PLAYING TAPE');
                     this.tapeIsPlaying = true;
                     this.emit('playingTape');
                     break;
                 case 'stoppedTape':
-                    console.log('WORKER - STOPPED TAPE');
+                    if (this.devMode) console.log('WORKER MESSAGE - STOPPED TAPE');
                     this.tapeIsPlaying = false;
                     this.emit('stoppedTape');
                     break;
+                case 'machineSetupDone':
+                    if (this.devMode) console.log('WORKER MESSAGE - MACHINE SETUP DONE');
+                    break;
                 default:
-                    console.log('WORKER - ' + e.data.message);
+                    if (this.devMode) {
+                        console.log('WORKER MESSAGE - OTHER');
+                        console.log(e.data);
+                    }
             }
         }
         this.worker.postMessage({
@@ -138,7 +152,7 @@ class Emulator extends EventEmitter {
         })
     }
 
-    start() {
+    async start() {
         if (!this.isRunning) {
             this.isRunning = true;
             this.isInitiallyPaused = false;
@@ -190,17 +204,16 @@ class Emulator extends EventEmitter {
 
     async loadRoms(type) {
         const romsToLoad = this.supportedMachines.getRomsByMachine(type);
-        await this.loadRom(romsToLoad['rom0'], romsToLoad['rom0_page']);
-        if (typeof romsToLoad['rom1'] !== 'undefined' && romsToLoad['rom1']) {
-            await this.loadRom(romsToLoad['rom1'], romsToLoad['rom1_page']);
+        let i = 0;
+        let load = true;
+        while (load) {
+            if (typeof romsToLoad['rom' + i] !== 'undefined' && romsToLoad['rom' + i]) {
+                await this.loadRom(romsToLoad['rom' + i], romsToLoad['rom' + i + '_page']);
+                i++;
+            } else {
+                load = false;
+            }
         }
-        if (typeof romsToLoad['rom2'] !== 'undefined' && romsToLoad['rom2']) {
-            await this.loadRom(romsToLoad['rom2'], romsToLoad['rom2_page']);
-        }
-        // Future !
-        // if (typeof romsToLoad['romN'] !== 'undefined' && romsToLoad['romN']) {
-        //     await this.loadRom(romsToLoad['romN'], romsToLoad['romN_page']);
-        // }
     }
 
     runFrame() {
@@ -241,9 +254,23 @@ class Emulator extends EventEmitter {
     };
 
     setMachine(type) {
+        const currentMachineTech = this.supportedMachines.getList()[type]['tech'];
+
         this.worker.postMessage({
             message: 'setMachineType',
-            type,
+            type: type,
+            ram: currentMachineTech['ram'],
+            frameCycleCount: currentMachineTech['frameCycleCount'],
+            mainScreenStartTstate: currentMachineTech['mainScreenStartTstate'],
+            tstatesPerRow: currentMachineTech['tstatesPerRow'],
+            borderTimeMask: currentMachineTech['borderTimeMask'],
+            buildContentionTable: currentMachineTech['buildContentionTable'],
+            betadiskEnabled: currentMachineTech['betadiskEnabled'],
+            betadiskROMActive: currentMachineTech['betadiskROMActive'],
+            memoryPageReadMap: currentMachineTech['memoryPageReadMap'],
+            memoryPageWriteMap: currentMachineTech['memoryPageWriteMap'],
+            pagingLocked: currentMachineTech['pagingLocked'],
+            isPentagonBased: currentMachineTech['isPentagonBased']
         });
         this.machineType = type;
         this.loadRoms(type).then(() => { this.emit('setMachine', type); });
@@ -273,10 +300,115 @@ class Emulator extends EventEmitter {
             message: 'openTAPFile',
             id: fileID,
             data,
-        })
+        });
         return new Promise((resolve, reject) => {
             this.fileOpenPromiseResolutions[fileID] = resolve;
         });
+    }
+
+    async inScreenKeyBoardClick(evt) {
+
+        if (!this.isRunning) {
+            return;
+        }
+        let target = evt.target;
+        if (!target.hasAttribute('data-row')) {
+            target = target.parentNode;
+        }
+
+        const id = target.getAttribute('data-id');
+        const row = target.getAttribute('data-row');
+        const mask = target.getAttribute('data-mask');
+        const isShift = target.getAttribute('data-shift') == 'true' ? true : false;
+        const caps = target.getAttribute('data-caps') == 'true' ? true : false;
+        const sym = target.getAttribute('data-sym') == 'true' ? true : false;
+        const lock = target.getAttribute('data-lock') == 'true' ? true : false;
+
+        if (lock) {
+            console.log('LOCK KEY');
+            if (this.inScreenKeyboardLocked && id == this.inScreenKeyboardLocked.getAttribute('data-id')) {
+                target.classList.remove('pushed');
+                this.inScreenKeyboardBuffer = null;
+            } else {
+                this.inScreenKeyboardBuffer = target;
+                target.classList.remove('pushed');
+            }
+        } else if (isShift) {
+            console.log('SHIFT KEY');
+            target.classList.add('pushed');
+            this.inScreenKeyboardBuffer = target;
+        } else if (this.inScreenKeyboardBuffer) {
+            console.log('AFTER LOCK/SHIFT KEY');
+            let shiftMask = this.inScreenKeyboardBuffer.getAttribute('data-mask');
+            let shiftRow = this.inScreenKeyboardBuffer.getAttribute('data-row');
+
+            this.worker.postMessage({
+                message: 'keyDown', row: Number(shiftRow), mask: Number(shiftMask),
+            });
+            await new Promise(r => setTimeout(r, 150));
+            this.worker.postMessage({
+                message: 'keyDown', row: Number(row), mask: Number(mask),
+            });
+            await new Promise(r => setTimeout(r, 150));
+            this.worker.postMessage({
+                message: 'keyUp', row: Number(row), mask: Number(mask),
+            });
+            await new Promise(r => setTimeout(r, 150));
+            this.worker.postMessage({
+                message: 'keyUp', row: Number(shiftRow), mask: Number(shiftMask),
+            });
+
+            if (this.inScreenKeyboardBuffer.getAttribute('data-shift')) {
+                this.inScreenKeyboardBuffer.classList.remove('pushed');
+                this.inScreenKeyboardBuffer = null;
+            }
+        } else if (caps) {
+            console.log('KEY WITH CAPS SHIFT');
+            this.worker.postMessage({
+                message: 'keyDown', row: Number(0), mask: Number(1),
+            });
+            await new Promise(r => setTimeout(r, 150));
+            this.worker.postMessage({
+                message: 'keyDown', row: Number(row), mask: Number(mask),
+            });
+            await new Promise(r => setTimeout(r, 150));
+            this.worker.postMessage({
+                message: 'keyUp', row: Number(row), mask: Number(mask),
+            });
+            await new Promise(r => setTimeout(r, 150));
+            this.worker.postMessage({
+                message: 'keyUp', row: Number(0), mask: Number(1),
+            });
+            this.inScreenKeyboardBuffer = null;
+        } else if (sym) {
+            console.log('KEY WITH SYM SHIFT');
+            this.worker.postMessage({
+                message: 'keyDown', row: Number(7), mask: Number(0x02),
+            });
+            await new Promise(r => setTimeout(r, 150));
+            this.worker.postMessage({
+                message: 'keyDown', row: Number(row), mask: Number(mask),
+            });
+            await new Promise(r => setTimeout(r, 150));
+            this.worker.postMessage({
+                message: 'keyUp', row: Number(row), mask: Number(mask),
+            });
+            await new Promise(r => setTimeout(r, 150));
+            this.worker.postMessage({
+                message: 'keyUp', row: Number(7), mask: Number(0x02),
+            });
+            this.inScreenKeyboardBuffer = null;
+        } else {
+            console.log('KEY');
+            this.worker.postMessage({
+                message: 'keyDown', row: Number(row), mask: Number(mask),
+            });
+            await new Promise(r => setTimeout(r, 150));
+            this.worker.postMessage({
+                message: 'keyUp', row: Number(row), mask: Number(mask),
+            });
+            this.inScreenKeyboardBuffer = null;
+        }
     }
 
     openTZXFile(data) {
@@ -415,16 +547,17 @@ window.js8bits = (container, opts) => {
     opts = opts || {};
 
     container.classList.add('js8bits-container');
-
     const canvas = document.createElement('canvas');
     canvas.width = 320;
     canvas.height = 240;
 
     const supportedMachines = new SupportedMachines();
-
     const keyboardEnabled = ('keyboardEnabled' in opts) ? opts.keyboardEnabled : true;
+    const inScreenKeyboardEnabled = ('inScreenKeyboardEnabled' in opts) ? opts.inScreenKeyboardEnabled : true;
+    const devMode = ('devbugMode' in opts) ? opts.devMode : true;
     const uiEnabled = ('uiEnabled' in opts) ? opts.uiEnabled : true;
 
+    // Emulator
     const emu = new Emulator(canvas, {
         machine: opts.machine || '1',
         autoStart: opts.autoStart || false,
@@ -433,15 +566,34 @@ window.js8bits = (container, opts) => {
         openUrl: opts.openUrl,
         tapeTrapsEnabled: ('tapeTrapsEnabled' in opts) ? opts.tapeTrapsEnabled : false,
         keyboardEnabled: keyboardEnabled,
+        devMode: devMode,
         worker: supportedMachines.getList()[opts.machine || '1']['worker'],
     });
 
+    //UI
     const ui = new UIController(container, emu, {
-        zoom: opts.zoom || 1,
+        zoom: opts.zoom || 'fit',
         sandbox: opts.sandbox,
         uiEnabled: uiEnabled,
     });
 
+    // deviceClass
+    function deviceClass() {
+        container.classList.remove('mobile', 'tablet', 'desktop');
+        if (container.clientWidth < 768) {
+            container.classList.add('mobile');
+        } else if (container.clientWidth < 1200) {
+            container.classList.add('mobile', 'tablet');
+        } else {
+            container.classList.add('mobile', 'tablet', 'desktop');
+        }
+    }
+    deviceClass();
+    addEventListener("resize", (event) => {
+        deviceClass();
+    });
+
+    //Keyboard
     if (keyboardEnabled) {
         if (ui.appContainer.tabIndex == -1) {
             ui.appContainer.tabIndex = 0;  // allow receiving focus for keyboard events
@@ -449,16 +601,29 @@ window.js8bits = (container, opts) => {
         emu.setKeyboardEventRoot(ui.appContainer);
     }
 
+    // Generate UI
     if (uiEnabled) {
+
+        // inScreenKeyboard
+        if (inScreenKeyboardEnabled) {
+            const machineKeyboard = ui.keyboard.addKeyboard((evt) => {
+                emu.inScreenKeyBoardClick(evt);
+            })
+        };
+
+        // Menu top
         const machineMenu = ui.menuBar.addMenu('Hardware', 'hardware');
         const machineItem = machineMenu.addDataHeader();
         const orderedMachines = supportedMachines.getOrderedList();
         Object.keys(orderedMachines).forEach(function (item) {
             const machineItem = machineMenu.addDataItem(orderedMachines[item], () => {
                 emu.setMachine(orderedMachines[item]['id']);
+                machineItem.setActive();
+                machineMenu.setInactiveExcept(orderedMachines[item]['id']);
                 emu.focus();
             }, orderedMachines[item]['id']);
         });
+        machineMenu.setInactiveExcept(opts.machine || '1');
 
         const fileMenu = ui.menuBar.addMenu('Software', 'software');
         if (!opts.sandbox) {
@@ -498,19 +663,32 @@ window.js8bits = (container, opts) => {
         const displayMenu = ui.menuBar.addMenu('Display', 'display');
         const zoomItemsBySize = {
             1: displayMenu.addItem('320x240', () => { ui.setZoom(1); emu.focus(); }),
-            2: displayMenu.addItem('640x480', () => { ui.setZoom(2); emu.focus(); }),
-            3: displayMenu.addItem('960x720', () => { ui.setZoom(3); emu.focus(); }),
+            2: displayMenu.addItem('480x360', () => { ui.setZoom(1.5); emu.focus(); }),
+            3: displayMenu.addItem('640x480', () => { ui.setZoom(2); emu.focus(); }),
+            4: displayMenu.addItem('800x600', () => { ui.setZoom(2.5); emu.focus(); }),
+            5: displayMenu.addItem('960x720', () => { ui.setZoom(3); emu.focus(); }),
         }
         const fullscreenItem = displayMenu.addItem('Fullscreen', () => {
             ui.enterFullscreen();
         })
+        const fitContainerWidth = displayMenu.addItem('Fit window', () => {
+            ui.setZoom('fit');
+        })
         const setZoomCheckbox = (factor) => {
             if (factor == 'fullscreen') {
                 fullscreenItem.setActive();
+                fitContainerWidth.unsetActive();
+                for (let i in zoomItemsBySize) {
+                    zoomItemsBySize[i].unsetActive();
+                }
+            } else if (factor == 'fit') {
+                fitContainerWidth.setActive();
+                fullscreenItem.unsetActive();
                 for (let i in zoomItemsBySize) {
                     zoomItemsBySize[i].unsetActive();
                 }
             } else {
+                fitContainerWidth.unsetActive();
                 fullscreenItem.unsetActive();
                 for (let i in zoomItemsBySize) {
                     if (parseInt(i) == factor) {
@@ -520,36 +698,21 @@ window.js8bits = (container, opts) => {
                     }
                 }
             }
+            ui.positionPlayButton();
         }
 
         ui.on('setZoom', setZoomCheckbox);
         setZoomCheckbox(ui.zoom);
 
         emu.on('setMachine', (type) => {
-            // Update hardware menu
-            const hardwareMenu = document.getElementById('ui-bar-menu-hardware');
-            if (hardwareMenu.hasChildNodes()) {
-                var children = hardwareMenu.childNodes;
-                for (var i = 0; i < children.length; i++) {
-                    var button = children[i].firstChild;
-                    if (button.getAttribute('data-id') == type) {
-                        button.classList.add('active');
-                    } else {
-                        button.classList.remove('active');
-                    }
-                }
-            }
-
             var stylesArray = supportedMachines.getStyles();
             container.classList.remove(...stylesArray);
             container.classList.add(supportedMachines.getList()[type]['style']);
+            ui.keyboard.updateKeyboard(supportedMachines.getList()[type]['tech']['keyboard'], (evt) => {
+                emu.inScreenKeyBoardClick(evt);
+            });
         });
 
-        if (!opts.sandbox) {
-            ui.toolbar.addButton({ label: 'Open file' }, () => {
-                openFileDialog();
-            }, openIcon);
-        }
         ui.toolbar.addButton({ label: 'Reset' }, () => {
             emu.reset();
         }, resetIcon);
@@ -583,6 +746,11 @@ window.js8bits = (container, opts) => {
                 fullscreenButton.setLabel('Enter full screen mode');
             }
         });
+        if (inScreenKeyboardEnabled) {
+            const keyboardButton = ui.toolbar.addButton({ label: 'Display keyboard' }, () => {
+                ui.keyboard.display();
+            }, keyboardIcon);
+        }
         const tapeButton = ui.toolbar.addButton({ label: 'Start tape' }, () => {
             if (emu.tapeIsPlaying) {
                 emu.stopTape();

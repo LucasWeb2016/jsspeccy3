@@ -1,0 +1,134 @@
+@import 'variables';
+
+.js8bits-container {
+  &.spectrum128p2 {
+
+    div.js8bits-ui-bar,
+    div.js8bits-ui-toolbar {
+      background-color: $ui-grey-plastic-bg;
+
+      &>div>button,
+      &>button {
+        background-color: #828386;
+
+        &:hover {
+          background-color: $ui-bars-button-bg-hover-color;
+        }
+      }
+    }
+
+    div.js8bits-ui-bar {
+      background-image: url('images/spectrum128p2.webp');
+    }
+
+    div.js8bits-ui-toolbar {
+      background-image: url('images/spectrum128p-bottom.webp');
+    }
+
+    // keyboard
+    div.js8bits-ui-keyboard {
+      display: none;
+      padding: 0px;
+
+      &.opened {
+        display: block;
+      }
+
+      >div {
+        background-color: $ui-grey-plastic-bg;
+        margin: auto;
+        max-width: 1200px;
+        padding: 10px 0px;
+
+        &>div.keyboard-container {
+          font-style: italic;
+          gap: 0;
+          grid-template-columns: repeat(13, 1fr);
+
+          &>div {
+            padding: 2px;
+
+            &:nth-child(37) {
+              height: 100%;
+
+              &>div {
+                &.button-inner {
+                  height: 93%;
+                }
+              }
+            }
+
+            &:nth-last-child(2) {
+              &>div {
+                &.button-inner {
+                  >div.button-inner1 {
+                    color: #fff;
+                  }
+                }
+              }
+            }
+
+            &>div {
+
+              &.button-top1,
+              &.button-top2,
+              &.button-bottom {
+                display: none;
+              }
+
+              &.button-inner {
+                background-color: #808080;
+                border-radius: 5px;
+                height: 32px;
+                position: relative;
+
+                &.pushed {
+                  background-color: #504d4d;
+                }
+
+                &>div.button-inner1 {
+                  bottom: 2px;
+                  font-size: 16px;
+                  font-weight: bold;
+                  left: 5px;
+                  position: absolute;
+                  top: unset;
+                }
+
+                &>div.button-inner2 {
+                  color: #FFF;
+                  font-weight: bold;
+                  left: 5px;
+                  position: absolute;
+                  top: 2px;
+                }
+
+                &>div.button-inner3 {
+                  color: #fff;
+                  position: absolute;
+                  right: 5px;
+                  top: 2px;
+                }
+
+                &:hover {
+                  background-color: #575757;
+                }
+              }
+            }
+
+            &.one-action-key {
+              &>div {
+                &.button-inner {
+                  &>div.button-inner1 {
+                    text-align: center;
+                    bottom: 0;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

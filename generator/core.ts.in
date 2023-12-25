@@ -238,39 +238,31 @@ let loggingEnabled:bool = false;
 let logPtr = 0;
 
 let machineType:u32 = 2;
-export function setMachineType(type:u32):void {
+let resetPagingLocked:u32 = true;
+let resetMemoryPageReadMap:u32 = 8;
+let isPentagonBased = 0;
+
+export function setMachineType(type:u32, frontFrameCycleCount:u32, frontMainScreenStartTstate:u32, frontTstatesPerRow:u32, frontBorderTimeMask:u32, frontBuildContentionTable:u32, frontBetadiskEnabled:u32, frontBetadiskROMActive:u32, frontPagingLocked:u32, frontMemoryPageReadMap:u32, frontIsPentagonBased:u32 ):void {
     machineType = type;
-    if (type == 1 || type== 8 || type== 9 ||  type== 2 ||  type== 11 ||  type== 12 ||  type== 13 ||  type== 14 ||  type== 15 ||  type== 16 ||  type== 17 ||  type== 18 ||  type== 19 ||  type== 20 ||  type== 21 ||  type== 22 ||  type== 23 || type == 24 || type == 25 || type == 26 || type == 27 || type == 28 || type == 29 || type == 30 || type == 31 || type == 32 || type == 33 || type == 34 || type == 44 || type == 45 || type == 46 || type == 47 || type == 48 || type == 49 || type == 51 || type == 52 || type == 53 || type == 54 || type == 55 || type == 56 || type == 57 || type == 58 || type == 59 || type == 60 || type == 61 || type == 62 || type == 63 || type == 64 || type == 65 || type == 66 || type == 67 || type == 68 || type == 69 || type == 70 || type == 71) {
-        frameCycleCount = 69888;
-        recalculateAYCyclesPerSample();
-        buildScreenEventsTable(14335, 224, 0xfc);
-        buildContentionTable(14335, 224, frameCycleCount);
-    } else if (type == 8) {  // pentagon
-        frameCycleCount = 71680;
-        recalculateAYCyclesPerSample();
-        buildScreenEventsTable(17988, 224, 0xff);
-        clearContentionTable(frameCycleCount);
-        betadiskEnabled = true;
-        betadiskROMActive = false;
-    } else {  // Rest
-        frameCycleCount = 70908;
-        recalculateAYCyclesPerSample();
-        buildScreenEventsTable(14361, 228, 0xfc);
-        buildContentionTable(14361, 228, frameCycleCount);
-        betadiskEnabled = false;
+    frameCycleCount = frontFrameCycleCount;
+    recalculateAYCyclesPerSample();
+    buildScreenEventsTable(frontMainScreenStartTstate, frontTstatesPerRow, frontBorderTimeMask);
+    if(frontBuildContentionTable == 1) {
+        buildContentionTable(frontMainScreenStartTstate, frontTstatesPerRow, frameCycleCount);
     }
+    clearContentionTable(frameCycleCount);
+    betadiskEnabled = frontBetadiskEnabled ? true : false;
+    betadiskROMActive = frontBetadiskROMActive ? true : false;
+    resetPagingLocked = frontPagingLocked;
+    resetMemoryPageReadMap = frontMemoryPageReadMap;
+    isPentagonBased = frontIsPentagonBased;
+
     reset();
 }
 export function reset():void {
-    if (machineType == 1 || machineType == 9 || machineType == 2 || machineType == 11 || machineType == 12 || machineType == 13 || machineType == 14 || machineType == 15 || machineType == 16 || machineType == 17 || machineType == 18 || machineType == 19 || machineType == 20 || machineType == 21 || machineType == 22 || machineType == 23 || machineType == 24 || machineType == 25 || machineType == 26 || machineType == 27 || machineType == 28 || machineType == 29 || machineType == 30 || machineType == 31 || machineType == 32 || machineType == 33 || machineType == 34 || machineType == 44 || machineType == 45 || machineType == 46 || machineType == 47 || machineType == 48 || machineType == 49 || machineType == 51 || machineType == 52 || machineType == 53 || machineType == 54 || machineType == 55 || machineType == 56 || machineType == 57 || machineType == 58 || machineType == 59 || machineType == 60 || machineType == 61 || machineType == 62 || machineType == 63 || machineType == 64 || machineType == 65 || machineType == 66 || machineType == 67 || machineType == 68 || machineType == 69 || machineType == 70 || machineType == 71) { // 48k
-        memoryPageReadMap = [8, 5, 2, 0];
-        memoryPageWriteMap = [15, 5, 2, 0];
-        pagingLocked = 1;
-    } else {  // Others
-        memoryPageReadMap = [8, 5, 2, 0];
-        memoryPageWriteMap = [15, 5, 2, 0];
-        pagingLocked = 0;
-    }
+    memoryPageReadMap = [resetMemoryPageReadMap, 5, 2, 0];
+    memoryPageWriteMap = [15, 5, 2, 0];
+    pagingLocked = resetPagingLocked ? true : false;
     for (let i:u8 = 0; i < 14; i++) {
         writeAYRegister(i, 0);
     }
@@ -284,7 +276,7 @@ export function reset():void {
     opcodePrefix = 0;
     framebufferIndex = 0;
 }
-setMachineType(2);
+setMachineType(machineType, frameCycleCount, 14335, 224, 0xfc, 0, 0, 0, 1, resetMemoryPageReadMap,0);
 
 for (let i=0; i < 8; i++) {
     keyStates[i] = 0xff;
@@ -458,8 +450,12 @@ export function readPort(addr:u16):u8 {
     t++;
 
     let result:u8 = 0xff;
-
-    if (!(addr & 0x0001)) {
+    if ((machineType==23 || machineType==77 || machineType==78 || machineType==86 || machineType==87) && (addr & 0x7E) == 0x7E) {
+        /* poll keyboard */
+        result = pollKeyboard(u8(addr >> 8));
+        updateTapePulses(t);
+        result |= tapeLevel;
+    } else if (!(addr & 0x0001)) { // SI ES PAR, ENTRA
         /* poll keyboard */
         result = pollKeyboard(u8(addr >> 8));
         updateTapePulses(t);
@@ -469,7 +465,7 @@ export function readPort(addr:u16):u8 {
     } else if (!(addr & 0x00e0)) {
         /* kempston joystick */
         result = 0;
-    } else if (machineType != 8) {
+    } else if (!isPentagonBased) {
         /* floating bus */
         updateFramebuffer();
         result = floatingBusValue;

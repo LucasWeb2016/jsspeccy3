@@ -1,24 +1,21 @@
-// Variables
-$primary-font-family: monospace;
-$font-size: 13px;
-$container-bg-color: #e5e5e5;
-$ui-bars-button-color: #fff;
-$ui-bars-button-bg-color: #444;
-$ui-bars-button-bg-hover-color: #575656;
-$ui-bars-border-radius: 5px;
-$ui-bars-margin: 5px;
-$ui-bars-padding: 5px;
-$ui-back-plastic-bg : #1b1919;
-$ui-grey-plastic-bg : #66676B;
-$ui-white-plastic-bg : #b1b1b1;
+// Machines custom
+@import 'variables';
+@import 'byte';
+@import 'clone';
+@import 'inves';
+@import 'microdigitaltk';
+@import 'spectrum128p';
+@import 'spectrum128p2';
+@import 'tc2048';
 
-// UI styling
 
+// UI styling - MOBILE FIRST
 .js8bits-container {
   background-color: $container-bg-color;
   min-width: 250px;
   position: relative;
 
+  // Common menubar / toolbar
   div.js8bits-ui-bar,
   div.js8bits-ui-toolbar {
     background-color: $ui-back-plastic-bg;
@@ -43,7 +40,7 @@ $ui-white-plastic-bg : #b1b1b1;
     }
 
     &>div {
-      display:inline;
+      display: inline;
 
       &>ul {
         background-color: #fff;
@@ -83,6 +80,7 @@ $ui-white-plastic-bg : #b1b1b1;
     }
   }
 
+  // menu ar
   div.js8bits-ui-bar {
     background-image: url('images/spectrum48.webp');
     background-position: right center;
@@ -91,14 +89,18 @@ $ui-white-plastic-bg : #b1b1b1;
     height: 30px;
 
     ul#ui-bar-menu-hardware {
+      box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      -webkit-box-sizing: border-box;
       display: grid;
       gap: 0;
-      grid-template-columns: repeat(10, auto);
+      grid-template-columns: repeat(9, auto);
+      left: 0;
       overflow-x: auto;
       overflow-y: auto;
+      top: 40px;
       z-index: 1;
-      top:40px;
-      left:0;
+      border: 0;
 
       &>li {
         cursor: pointer;
@@ -110,18 +112,6 @@ $ui-white-plastic-bg : #b1b1b1;
           font-family: $primary-font-family;
           font-size: $font-size;
           padding: 3px 5px;
-
-          b.check-ok {
-            color: green;
-          }
-
-          b.check-ko {
-            color: red;
-          }
-
-          b.check-semi {
-            color: orange;
-          }
         }
 
         &.header {
@@ -155,7 +145,38 @@ $ui-white-plastic-bg : #b1b1b1;
         &.partially {
           >div {
             background-color: #fff4df;
-            color: orange;
+            color: #ffa500;
+          }
+        }
+
+        &.active {
+          >div {
+            font-weight: bold;
+
+            &:nth-child(2)::after {
+              content: " (Current machine)";
+            }
+          }
+
+          &.unemulated {
+            >div {
+              background-color: #ff0000;
+              color: #fbe7e7;
+            }
+          }
+
+          &.emulated {
+            >div {
+              background-color: #008000;
+              color: #e9fee9;
+            }
+          }
+
+          &.partially {
+            >div {
+              background-color: #ffa500;
+              color: #fff4df;
+            }
           }
         }
 
@@ -163,6 +184,246 @@ $ui-white-plastic-bg : #b1b1b1;
     }
   }
 
+  // keyboard
+  div.js8bits-ui-keyboard {
+    display: none;
+    padding: 0px 5px;
+
+    &.opened {
+      display: block;
+    }
+
+    >div {
+      background-color: $ui-back-plastic-bg;
+      margin: auto;
+      max-width: 1200px;
+      padding: 10px 0px;
+
+      &>div.keyboard-container {
+        color: #fff;
+        display: grid;
+        font-family: monospace;
+        font-size: 10px;
+        gap: 0;
+        grid-template-columns: repeat(10, 10%);
+
+        &>div {
+          padding: 0px 2px;
+
+          &>div {
+            min-height: 12px;
+
+            &.button-top1 {}
+
+            &.button-top2 {
+              color: #3DB241;
+            }
+
+            &.button-inner {
+              background-color: #808080;
+              border-radius: 5px;
+              height: 32px;
+              position: relative;
+
+              &.pushed {
+                background-color: #504d4d;
+              }
+
+              &>div.button-inner1 {
+                font-size: 16px;
+                font-weight: bold;
+                left: 3px;
+                position: absolute;
+                top: 3px;
+              }
+
+              &>div.button-inner2 {
+                color: #940808;
+                font-weight: bold;
+                position: absolute;
+                right: 3px;
+                top: 3px;
+
+                div.zx-key {
+                  background-color: #fff;
+                  height: 10px;
+                  position: relative;
+                  width: 10px;
+
+                  >span {
+                    background-color: #808080;
+                    height: 4px;
+                    position: absolute;
+                    width: 4px;
+                  }
+
+                  &.one {
+                    >span {
+                      right: 1px;
+                      top: 1px;
+                    }
+                  }
+
+                  &.two {
+                    >span {
+                      left: 1px;
+                      top: 1px;
+                    }
+                  }
+
+                  &.three {
+                    >span {
+                      right: 1px;
+                      top: 1px;
+                      width: 8px;
+                    }
+                  }
+
+                  &.four {
+                    >span {
+                      bottom: 1px;
+                      right: 1px;
+                    }
+                  }
+
+                  &.five {
+                    >span {
+                      height: 8px;
+                      right: 1px;
+                      top: 1px;
+                    }
+                  }
+
+                  &.six {
+                    >span:first-child {
+                      left: 1px;
+                      top: 1px;
+                    }
+
+                    >span:last-child {
+                      bottom: 1px;
+                      right: 1px;
+                    }
+                  }
+
+                  &.seven {
+                    border: 1px solid #fff;
+
+                    >span {
+                      bottom: 1px;
+                      left: 1px;
+                    }
+                  }
+                }
+              }
+
+              &>div.button-inner3 {
+                bottom: 2px;
+                color: #fff;
+                position: absolute;
+                right: 2px;
+              }
+
+              &:hover {
+                background-color: #575757;
+              }
+            }
+
+            &.button-bottom {
+              color: #FF1F1F;
+            }
+          }
+
+          &:nth-child(-n+10) {
+            &>div.button-top2 {
+              color: #fff;
+            }
+          }
+
+          &:nth-child(n+11) {
+            &>div.button-top1 {
+              display:none;
+            }
+          }
+
+          &:first-child {
+            &>div.button-top1 {
+              color: #0000ff;
+            }
+          }
+
+          &:nth-child(2) {
+            &>div.button-top1 {
+              color: #ff0000;
+            }
+          }
+
+          &:nth-child(3) {
+            &>div.button-top1 {
+              color: #ff00ff;
+            }
+          }
+
+          &:nth-child(4) {
+            &>div.button-top1 {
+              color: #3DB241;
+            }
+          }
+
+          &:nth-child(5) {
+            &>div.button-top1 {
+              color: #00ffff;
+            }
+          }
+
+          &:nth-child(6) {
+            &>div.button-top1 {
+              color: #ffff00;
+            }
+          }
+
+          &:nth-child(10) {
+            &>div.button-top1 {
+              background-color: #fff;
+              border-radius: 2px;
+              color: #000;
+              padding: 0px 1px;
+              width: fit-content;
+            }
+          }
+
+          &:nth-last-child(2) {
+            &>div.button-inner {
+              >div.button-inner1 {
+                color: #940808;
+              }
+            }
+          }
+
+          &.one-action-key {
+            &>div {
+              &.button-inner {
+                align-items: center;
+                display: flex;
+
+                &>div.button-inner1 {
+                  font-size: 10px;
+                  font-weight: bold;
+                  left: unset;
+                  position: relative;
+                  text-align: center;
+                  top: unset;
+                  width: 100%;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // toolbar
   div.js8bits-ui-toolbar {
     background-image: url('images/spectrum48-bottom.webp');
     background-position: right center;
@@ -179,140 +440,84 @@ $ui-white-plastic-bg : #b1b1b1;
     }
   }
 
-  // Investronica custom style
-  &.inves {
-    div.js8bits-ui-bar {
-      background-image: url('images/spectruminves.webp');
-    }
+  // Play button
+  button.js8bits-ui-play-button {
+    background-color: rgba(160, 160, 160, 0.7);
+    border: 0;
+    border-radius: 5px;
+    height: 64px;
+    left: 50%;
+    margin-left: -48px;
+    position: absolute;
+    top: 100px;
+    width: 96px;
 
-    div.js8bits-ui-toolbar {
-      background-image: url('images/spectrum48-bottom.webp');
-    }
-  }
-
-  // ZX Spectrum 128+ custom style
-  &.spectrum128p {
-    div.js8bits-ui-bar {
-      background-image: url('images/spectrum128p.webp');
-    }
-
-    div.js8bits-ui-toolbar {
-      background-image: url('images/spectrum128p-bottom.webp');
+    >svg {
+      height: 56px;
+      vertical-align: middle;
     }
   }
+}
 
-  // ZX Spectrum 128+2 custom style
-  &.spectrum128p2 {
-
-    div.js8bits-ui-bar,
-    div.js8bits-ui-toolbar {
-      background-color: $ui-grey-plastic-bg;
-
-      &>div>button,
-      &>button {
-        background-color: #828386;
-
-        &:hover {
-          background-color: $ui-bars-button-bg-hover-color;
-        }
-      }
+// UI styling - TABLET
+.js8bits-container.tablet {
+  >div {
+    >button.js8bits-ui-play-button {
+      top: 125px;
     }
 
-    div.js8bits-ui-bar {
-      background-image: url('images/spectrum128p2.webp');
-    }
+    >div.js8bits-ui-keyboard {
+      position:absolute;
+      bottom:40px;
+      opacity:0.5;
+      width:100%;
+      >div {
+        border-radius: 10px;
+        margin: 10px auto;
+        padding: 5px;
 
-    div.js8bits-ui-toolbar {
-      background-image: url('images/spectrum128p-bottom.webp');
-    }
-  }
 
-  // byte clone custom style
-  &.byte {
+        >div.keyboard-container {
+          >div {
+            padding: 0px 6px;
 
-    div.js8bits-ui-bar,
-    div.js8bits-ui-toolbar {
-      background-color: $ui-grey-plastic-bg;
-
-      &>div>button,
-      &>button {
-        background-color: #000;
-
-        &:hover {
-          background-color: $ui-bars-button-bg-hover-color;
-        }
-      }
-    }
-
-    div.js8bits-ui-bar {
-      background-image: url('images/byte.webp');
-    }
-
-    div.js8bits-ui-toolbar {
-      background-image: url('images/byte-bottom.webp');
-
-      &>button {
-        svg {
-          fill: #fff;
-
-          >g {
-            stroke: #ccc !important;
-          }
-
-        }
-      }
-    }
-  }
-
-  // TC2048 custom style
-  &.tc2048 {
-
-    div.js8bits-ui-bar,
-    div.js8bits-ui-toolbar {
-      background-color: #3e3a3a;
-
-      &>div>button,
-      &>button {
-        background-color: #fff;
-        color: #000;
-
-        &:hover {
-          background-color: $ui-bars-button-bg-hover-color;
-        }
-      }
-    }
-
-    &>div {
-      &>ul {
-        li {
-          button {
-            &.active {
-              background-color: #53C6F3;
+            >div.button-top2 {
+              font-size: 10px;
             }
+
+            >div.button-inner {
+              height: 35px;
+
+              >div.button-inner1 {
+                font-size: 20px;
+                left: 5px;
+                top: 3px;
+              }
+
+              >div.button-inner2 {
+                font-size: 12px;
+                right: 5px;
+                top: 3px;
+              }
+
+              >div.button-inner3 {
+                bottom: 3px;
+                font-size: 12px;
+                font-weight: normal;
+                right: 5px;
+              }
+            }
+
           }
 
-          &:hover {
-            background-color: #89a4af;
-          }
-        }
-      }
-    }
-
-    div.js8bits-ui-bar {
-      background-image: url('images/tc2048.webp');
-    }
-
-    div.js8bits-ui-toolbar {
-      background-image: url('images/tc2048-bottom.webp');
-
-      &>button {
-        svg {
-          fill: #000;
-
-          >path {
-            >g {
-              >g {
-                stroke: #474747;
+          >div.one-action-key {
+            >div.button-inner {
+              >div.button-inner1 {
+                font-size: 16px;
+                left: unset;
+                line-height: 13px;
+                top: unset;
+                width: 100%;
               }
             }
           }
@@ -320,126 +525,11 @@ $ui-white-plastic-bg : #b1b1b1;
       }
     }
   }
+}
 
-  // TC2068 custom style
-  &.tc2068 {
-
-    div.js8bits-ui-bar,
-    div.js8bits-ui-toolbar {
-      background-color: #3e3a3a;
-
-      &>div>button,
-      &>button {
-        background-color: #fff;
-        color: #000;
-
-        &:hover {
-          background-color: $ui-bars-button-bg-hover-color;
-        }
-      }
-    }
-
-    &>div {
-      &>ul {
-        li {
-          button {
-            &.active {
-              background-color: #53C6F3;
-            }
-          }
-
-          &:hover {
-            background-color: #89a4af;
-          }
-        }
-      }
-    }
-
-    div.js8bits-ui-bar {
-      background-image: url('images/tc2068.webp');
-    }
-
-    div.js8bits-ui-toolbar {
-      background-image: url('images/tc2048-bottom.webp');
-
-      &>button {
-        svg {
-          fill: #000;
-
-          >path {
-            >g {
-              >g {
-                stroke: #474747;
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-
-  // tk90x custom style
-  &.microdigitaltk90x {
-    div.js8bits-ui-bar {
-      background-image: url('images/tk90x.webp');
-    }
-
-    div.js8bits-ui-toolbar {
-      background-image: url('images/tk90x-bottom.webp');
-    }
-  }
-
-
-  // tk95 custom style
-  &.microdigitaltk95 {
-
-    div.js8bits-ui-bar,
-    div.js8bits-ui-toolbar {
-      background-color: #3e3a3a;
-
-      &>div>button,
-      &>button {
-        background-color: #699AAD;
-
-        &:hover {
-          background-color: $ui-bars-button-bg-hover-color;
-        }
-      }
-    }
-
-    &>div {
-      &>ul {
-        li {
-          button {
-            &.active {
-              background-color: #699AAD;
-            }
-          }
-
-          &:hover {
-            background-color: #89a4af;
-          }
-        }
-      }
-    }
-
-    div.js8bits-ui-bar {
-      background-image: url('images/tk95.webp');
-    }
-
-    div.js8bits-ui-toolbar {
-      background-image: url('images/tk95-bottom.webp');
-    }
-  }
-
-  // Common clone custom style
-  &.clone {
-    div.js8bits-ui-bar {
-      background-image: url('images/clone.webp');
-    }
-
-    div.js8bits-ui-toolbar {
-      background-image: url('images/spectrum48-bottom.webp');
-    }
+// UI styling - DESKTOP
+.js8bits-container.desktop {
+  button.js8bits-ui-play-button {
+    top: 200px;
   }
 }

@@ -1,0 +1,38 @@
+@import 'variables';
+
+.js8bits-container {
+    &.byte {
+
+      div.js8bits-ui-bar,
+      div.js8bits-ui-toolbar {
+        background-color: $ui-white-plastic-bg;
+
+        &>div>button,
+        &>button {
+          background-color: #808080;
+
+          &:hover {
+            background-color: $ui-bars-button-bg-hover-color;
+          }
+        }
+      }
+
+      div.js8bits-ui-bar {
+        background-image: url('images/byte.webp');
+      }
+
+      div.js8bits-ui-toolbar {
+
+        &>button {
+          svg {
+            fill: #000;
+
+            >g {
+              stroke: #ccc !important;
+            }
+
+          }
+        }
+      }
+    }
+}

@@ -1,8 +1,9 @@
 import EventEmitter from 'events';
+import { spectrum48KeyboardMap } from './keyboardMaps/spectrum48.js';
+import { spectrum128p2KeyboardMap } from './keyboardMaps/spectrum128p2.js';
 
 import playIcon from './icons/play.svg';
 import closeIcon from './icons/close.svg';
-
 
 export class MenuBar {
     constructor(container) {
@@ -87,11 +88,12 @@ export class Menu {
         this.list.style.display = 'block';
         if (this.list.getAttribute('data-type') == 'hardware') {
             this.list.style.display = 'grid';
-            console.log('client : '+this.container.parentNode.clientWidth);
-            console.log('offset : '+this.container.parentNode.offsetWidth);
-            console.log('scroll : '+this.container.parentNode.scrollWidth);
-            this.list.style.width = (this.container.parentNode.parentNode.clientWidth - 10) + 'px';
-            this.list.style.height = (this.container.parentNode.parentNode.clientHeight - 88) + 'px';
+            this.list.style.width = (this.container.parentNode.parentNode.clientWidth) + 'px';
+            this.list.style.height = (this.container.parentNode.parentNode.clientHeight - 84) + 'px';
+            addEventListener("resize", (event) => {
+                this.list.style.width = (this.container.parentNode.parentNode.clientWidth) + 'px';
+                this.list.style.height = (this.container.parentNode.parentNode.clientHeight - 84) + 'px';
+            });
         }
     }
 
@@ -122,6 +124,18 @@ export class Menu {
         }
     }
 
+    setInactiveExcept(type) {
+        // Tiene que recorrer cada hijo y solo dejar clase "active" en el correcto.
+        const targets = this.list.childNodes;
+        for (var i = 0; i < targets.length; i++) {
+            if (targets[i].getAttribute('data-id') == type) {
+                targets[i].classList.add('active');
+            } else {
+                targets[i].classList.remove('active');
+            }
+        }
+    }
+
     addDataItem(item, onClick, type = false) {
         const li = document.createElement('li');
         this.list.appendChild(li);
@@ -138,16 +152,16 @@ export class Menu {
             li.classList.add('unemulated');
         }
         // family
-        let temp = document.createElement('div');
-        temp.innerHTML = item['family'];
-        li.appendChild(temp);
+        // let temp = document.createElement('div');
+        // temp.innerHTML = item['family'];
+        // li.appendChild(temp);
         // model
-        temp = document.createElement('div');
+        let temp = document.createElement('div');
         temp.innerHTML = item['model'];
         li.appendChild(temp);
         // memory
         temp = document.createElement('div');
-        temp.innerHTML = item['memory'] + 'k';
+        temp.innerHTML = item['tech']['ram'] + 'k';
         li.appendChild(temp);
         // year
         temp = document.createElement('div');
@@ -171,7 +185,7 @@ export class Menu {
         li.appendChild(temp);
         // autoload usr0
         temp = document.createElement('div');
-        if (item['tape_usr0']) {
+        if (item['tech']['usr0']) {
             temp.innerHTML = '<b class="check-ok">&#10004;<b>';
         } else {
             temp.innerHTML = '<b class="check-ko">&#10006;<b>';
@@ -200,11 +214,11 @@ export class Menu {
         li.classList.add('header');
         this.list.appendChild(li);
         // family
-        let temp = document.createElement('div');
-        temp.innerHTML = 'Family';
-        li.appendChild(temp);
+        // let temp = document.createElement('div');
+        // temp.innerHTML = 'Family';
+        // li.appendChild(temp);
         // model
-        temp = document.createElement('div');
+        let temp = document.createElement('div');
         temp.innerHTML = 'Model';
         li.appendChild(temp);
         // memory
@@ -240,6 +254,101 @@ export class Menu {
         temp = document.createElement('div');
         temp.innerHTML = 'Comments';
         li.appendChild(temp);
+    }
+}
+
+export class inScreenKeyboard {
+    constructor(container) {
+        this.container = container;
+        this.elem = document.createElement('div');
+        this.elem.classList.add('js8bits-ui-keyboard');
+        container.appendChild(this.elem);
+        this.keyboard = new spectrum48KeyboardMap();
+    }
+    display() {
+        if (this.elem.classList.contains('opened')) {
+            this.elem.classList.remove('opened');
+        } else {
+            this.elem.classList.add('opened');
+        }
+    }
+    updateKeyboard(newKeyboard, onClick) {
+        if (newKeyboard == 'spectrum128p2') {
+            this.keyboard = new spectrum128p2KeyboardMap();
+        } else {
+            this.keyboard = new spectrum48KeyboardMap();
+        }
+        this.elem.innerHTML = "";
+        this.addKeyboard(onClick);
+    }
+    addKeyboard(onClick) {
+        const keys = this.keyboard.getKeyboardLayout();
+        const innerContainer = document.createElement('div');
+        this.elem.appendChild(innerContainer);
+        const row = document.createElement('div');
+        row.classList.add('keyboard-container');
+        innerContainer.appendChild(row);
+        Object.keys(keys).forEach(function (item) {
+            let button = document.createElement('div');
+            if (keys[item].hasOwnProperty('oneaction')) {
+                button.classList.add('one-action-key');
+            }
+            if (keys[item].hasOwnProperty('shift')) {
+                button.classList.add('shift-key');
+            }
+            if (keys[item].hasOwnProperty('gridColumn') && keys[item].gridColumn) {
+                button.style.gridColumn = keys[item].gridColumn;
+            }
+            if (keys[item].hasOwnProperty('gridRow') && keys[item].gridRow) {
+                button.style.gridRow = keys[item].gridRow;
+            }
+            let top1 = document.createElement('div');
+            top1.classList.add('button-top1');
+            top1.innerHTML = keys[item].top1 ? keys[item].top1 : "";
+            button.appendChild(top1);
+            let top2 = document.createElement('div');
+            top2.classList.add('button-top2');
+            top2.innerHTML = keys[item].top2 ? keys[item].top2 : "";
+            button.appendChild(top2);
+            let innerButton = document.createElement('div');
+            innerButton.setAttribute('data-id', keys[item].id);
+            innerButton.setAttribute('data-row', keys[item].row);
+            innerButton.setAttribute('data-mask', keys[item].mask);
+            if (keys[item].hasOwnProperty('lock') && keys[item].lock === true) {
+                innerButton.setAttribute('data-lock', keys[item].lock);
+            }
+            if (keys[item].hasOwnProperty('capshift') && keys[item].capshift === true) {
+                innerButton.setAttribute('data-caps', keys[item].capshift);
+            }
+            if (keys[item].hasOwnProperty('symshift') && keys[item].symshift === true) {
+                innerButton.setAttribute('data-sym', keys[item].symshift);
+            }
+            if (keys[item].hasOwnProperty('shift')) {
+                innerButton.setAttribute('data-shift', keys[item].shift);
+            }
+            innerButton.classList.add('button-inner');
+            button.appendChild(innerButton);
+            let inner1 = document.createElement('div');
+            inner1.classList.add('button-inner1');
+            inner1.innerHTML = keys[item].inner1 ? keys[item].inner1 : "";
+            innerButton.appendChild(inner1);
+            let inner2 = document.createElement('div');
+            inner2.classList.add('button-inner2');
+            inner2.innerHTML = keys[item].inner2 ? keys[item].inner2 : "";
+            innerButton.appendChild(inner2);
+            let inner3 = document.createElement('div');
+            inner3.classList.add('button-inner3');
+            inner3.innerHTML = keys[item].inner3 ? keys[item].inner3 : "";
+            innerButton.appendChild(inner3);
+            if (onClick) {
+                innerButton.addEventListener('click', onClick);
+            }
+            let bottom = document.createElement('div');
+            bottom.classList.add('button-bottom');
+            bottom.innerHTML = keys[item].bottom ? keys[item].bottom : "";
+            button.appendChild(bottom);
+            row.appendChild(button);
+        });
     }
 }
 
@@ -321,8 +430,9 @@ class ToolbarButton {
 
 
 export class UIController extends EventEmitter {
-    constructor(container, emulator, opts) {
+    constructor(container, emulator, opts,) {
         super();
+        this.container = container;
         this.canvas = emulator.canvas;
         this.uiEnabled = ('uiEnabled' in opts) ? opts.uiEnabled : true;
 
@@ -354,29 +464,23 @@ export class UIController extends EventEmitter {
         if (this.uiEnabled) {
             this.menuBar = new MenuBar(this.appContainer);
         }
+
         this.appContainer.appendChild(this.canvas);
         this.canvas.style.objectFit = 'contain';
         this.canvas.style.display = 'block';
+
+        if (this.uiEnabled) {
+            this.keyboard = new inScreenKeyboard(this.appContainer);
+        }
 
         if (this.uiEnabled) {
             this.toolbar = new Toolbar(this.appContainer);
         }
 
         this.startButton = document.createElement('button');
+        this.startButton.classList.add('js8bits-ui-play-button');
         this.startButton.innerHTML = playIcon;
         this.appContainer.appendChild(this.startButton);
-        this.startButton.style.position = 'absolute';
-        this.startButton.style.top = '50%';
-        this.startButton.style.left = '50%';
-        this.startButton.style.width = '96px';
-        this.startButton.style.height = '64px';
-        this.startButton.style.marginLeft = '-48px';
-        this.startButton.style.marginTop = '-32px';
-        this.startButton.style.backgroundColor = 'rgba(160, 160, 160, 0.7)';
-        this.startButton.style.border = 'none';
-        this.startButton.style.borderRadius = '4px';
-        this.startButton.firstChild.style.height = '56px';
-        this.startButton.firstChild.style.verticalAlign = 'middle';
         this.startButton.addEventListener('mouseenter', () => {
             this.startButton.style.backgroundColor = 'rgba(128, 128, 128, 0.7)';
         });
@@ -454,7 +558,7 @@ export class UIController extends EventEmitter {
             }
         })
 
-        this.setZoom(opts.zoom || 1);
+        this.setZoom(opts.zoom || 'fit');
 
         if (!opts.sandbox) {
             /* drag-and-drop for loading files */
@@ -490,21 +594,51 @@ export class UIController extends EventEmitter {
         }
     }
 
+    positionPlayButton() {
+        let canvasHeight = this.canvas.clientHeight;
+        this.startButton.style.top = '' + (canvasHeight / 2) + 'px';
+    }
+
     setZoom(factor) {
         this.zoom = factor;
         if (this.isFullscreen) {
             document.exitFullscreen();
-            return;  // setZoom will be retriggered once fullscreen has exited
+            return;
         }
-        const displayWidth = 320 * this.zoom;
-        const displayHeight = 240 * this.zoom;
+        let displayWidth = 320;
+        let displayHeight = 240;
+        if (factor == 'fit') {
+            if ((this.container.clientWidth / (this.container.clientHeight - 84)) > (320/240)) {
+                displayHeight = (this.container.clientHeight - 84);
+                displayWidth = Math.ceil((240 * displayHeight) / 320);
+            } else {
+                displayWidth = this.container.clientWidth;
+                displayHeight = Math.ceil((320 * displayWidth) / 240);
+            }
+
+            addEventListener("resize", (event) => {
+                if ((this.container.clientWidth / (this.container.clientHeight - 84)) > (320 / 240)) {
+                    displayWidth = this.container.clientWidth;
+                    displayHeight = Math.ceil((320 * displayWidth) / 240);
+                } else {
+                    displayHeight = (this.container.clientHeight - 84);
+                    displayWidth = Math.ceil((240 * displayHeight) / 320);
+                }
+                this.canvas.style.width = '' + displayWidth + 'px';
+                this.canvas.style.height = '' + displayHeight + 'px';
+                this.emit('setZoom', factor);
+            });
+        } else {
+            this.zoom = factor;
+            displayWidth = 320 * this.zoom;
+            displayHeight = 240 * this.zoom;
+        }
+
         this.canvas.style.width = '' + displayWidth + 'px';
         this.canvas.style.height = '' + displayHeight + 'px';
         this.canvas.style.margin = 'auto';
-        //this.appContainer.style.width = '' + displayWidth + 'px';
         this.emit('setZoom', factor);
     }
-
     enterFullscreen() {
         this.appContainer.requestFullscreen();
     }

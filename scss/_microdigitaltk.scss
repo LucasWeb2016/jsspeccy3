@@ -1,0 +1,54 @@
+@import 'variables';
+
+.js8bits-container {
+  &.microdigitaltk90x {
+    div.js8bits-ui-bar {
+      background-image: url('images/tk90x.webp');
+    }
+
+    div.js8bits-ui-toolbar {
+      background-image: url('images/tk90x-bottom.webp');
+    }
+  }
+
+  &.microdigitaltk95 {
+
+    div.js8bits-ui-bar,
+    div.js8bits-ui-toolbar {
+      background-color: #3e3a3a;
+
+      &>div>button,
+      &>button {
+        background-color: #699AAD;
+
+        &:hover {
+          background-color: $ui-bars-button-bg-hover-color;
+        }
+      }
+    }
+
+    &>div {
+      &>ul {
+        li {
+          button {
+            &.active {
+              background-color: #699AAD;
+            }
+          }
+
+          &:hover {
+            background-color: #89a4af;
+          }
+        }
+      }
+    }
+
+    div.js8bits-ui-bar {
+      background-image: url('images/tk95.webp');
+    }
+
+    div.js8bits-ui-toolbar {
+      background-image: url('images/tk95-bottom.webp');
+    }
+  }
+}
