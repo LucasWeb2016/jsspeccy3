@@ -1,8 +1,8 @@
 export class spectrum128p2KeyboardMap {
   constructor() {
     this.keycodes = {
-      501: { row: null, mask: null, type: 'key', layoutRowOrder: 1, inner1: 'TRUE<br/>VIDEO', oneAction: true }, /* TRUE VIDEO - TODO ! */
-      502: { row: null, mask: null, type: 'key', layoutRowOrder: 2, inner1: 'INV<br/>VIDEO', oneAction: true }, /* INV VIDEO - TODO ! */
+      220: { row: 3, mask: 0x04, shiftKey: 16, type: 'key', layoutRowOrder: 1, inner1: 'TRUE<br/>VIDEO', oneAction: true }, /* TRUE VIDEO (º PC Key)) */
+      187: { row: 3, mask: 0x08, shiftKey: 16, type: 'key', layoutRowOrder: 2, inner1: 'INV<br/>VIDEO', oneAction: true }, /* INV VIDEO (+ PC Key) */
       49: { row: 3, mask: 0x01, type: 'key', layoutRowOrder: 3, inner1: '1', inner2: '!' }, /* 1 (1 PC Key) */
       50: { row: 3, mask: 0x02, type: 'key', layoutRowOrder: 4, inner1: '2', inner2: '@' }, /* 2 (2 PC Key)*/
       51: { row: 3, mask: 0x04, type: 'key', layoutRowOrder: 5, inner1: '3', inner2: '#' }, /* 3 (3 PC Key)*/
@@ -13,10 +13,10 @@ export class spectrum128p2KeyboardMap {
       56: { row: 4, mask: 0x04, type: 'key', layoutRowOrder: 10, inner1: '8', inner2: '(' }, /* 8 (8 PC Key)*/
       57: { row: 4, mask: 0x02, type: 'key', layoutRowOrder: 11, inner1: '9', inner3: ')' }, /* 9 (9 PC Key)*/
       48: { row: 4, mask: 0x01, type: 'key', layoutRowOrder: 12, inner1: '0', inner3: '_' }, /* 0 (0 PC Key)*/
-      219: { row: null, mask: null, type: 'key', layoutRowOrder: 13, inner1: 'BREAK', oneAction: true }, /* BREAK (' PC Key) */
+      219: { row: 7, mask: 0x01, shiftKey: 16, type: 'key', layoutRowOrder: 13, inner1: 'BREAK', oneAction: true }, /* BREAK (' PC Key) */
 
-      8: { row: 4, mask: 0x01, shiftKey: 226, type: 'key', layoutRowOrder: 14, inner1: 'DELETE', oneAction: true }, /* Delete (Delete PC Key) */
-      504: { row: null, mask: null, type: 'key', layoutRowOrder: 15, inner1: 'GRAPH', oneAction: true }, /* GRAPH - TODO!  */
+      8: { row: 4, mask: 0x01, shiftKey: 16, type: 'key', layoutRowOrder: 14, inner1: 'DELETE', oneAction: true }, /* Delete (Delete PC Key) */
+      9: { row: 4, mask: 0x02, shiftKey: 16, type: 'key', layoutRowOrder: 15, inner1: 'GRAPH', oneAction: true }, /* GRAPH (Tab PC Key)  */
       81: { row: 2, mask: 0x01, type: 'key', layoutRowOrder: 16, inner1: 'Q' }, /* Q (Q PC Key) */
       87: { row: 2, mask: 0x02, type: 'key', layoutRowOrder: 17, inner1: 'W' }, /* W (W PC Key) */
       69: { row: 2, mask: 0x04, type: 'key', layoutRowOrder: 18, inner1: 'E' }, /* E (E PC Key) */
@@ -28,8 +28,8 @@ export class spectrum128p2KeyboardMap {
       79: { row: 5, mask: 0x02, type: 'key', layoutRowOrder: 24, inner1: 'O' }, /* O (O PC Key) */
       80: { row: 5, mask: 0x01, type: 'key', layoutRowOrder: 25, inner1: 'P' }, /* P (P PC Key) */
 
-      505: { row: null, mask: null, type: 'key', layoutRowOrder: 26, inner1: 'EXTEND MODE', oneAction: true, gridColumn: '1 / 3', gridRow: '3' }, /* EXTEND MODE - TODO!  */
-      506: { row: null, mask: null, type: 'key', layoutRowOrder: 27, inner1: 'EDIT', oneAction: true }, /* EDIT - TODO!  */
+      20: { row: 7, mask: 0x02, shiftKey: 16, type: 'key', layoutRowOrder: 26, inner1: 'EXTEND MODE', oneAction: true, gridColumn: '1 / 3', gridRow: '3' }, /* EXTEND MODE (Caps lock PC Key) */
+      221: { row: 3, mask: 0x01, shiftKey: 16, type: 'key', layoutRowOrder: 27, inner1: 'EDIT', oneAction: true }, /* EDIT (¡ PC Key)  */
       65: { row: 1, mask: 0x01, type: 'key', layoutRowOrder: 28, inner1: 'A' }, /* A (A PC Key) */
       83: { row: 1, mask: 0x02, type: 'key', layoutRowOrder: 29, inner1: 'S' }, /* S (S PC Key) */
       68: { row: 1, mask: 0x04, type: 'key', layoutRowOrder: 30, inner1: 'D' }, /* D (D PC Key) */
@@ -41,8 +41,8 @@ export class spectrum128p2KeyboardMap {
       76: { row: 6, mask: 0x02, type: 'key', layoutRowOrder: 36, inner1: 'L', inner2: '=' }, /* L (L PC Key) */
       13: { row: 6, mask: 0x01, type: 'key', layoutRowOrder: 38, inner1: 'ENTER', oneAction: true, gridColumn: '13 / 14', gridRow: '2 / 4' }, /* Enter (Enter PC Key) */
 
-      226: { row: 0, mask: 0x01, type: 'key', layoutRowOrder: 39, inner1: 'CAPS SHIFT', shift: true, oneAction: true, gridColumn: '1 / 3', gridRow: '4' }, /* CAPS SHIFT LEFT (< PC Key) */
-      20: { row: 3, mask: 0x02, symshift:true, type: 'key', layoutRowOrder: 40, inner1: 'CAPS LOCK', oneAction: true, lock:true }, /* CAPS LOCK (Caps lock PC Key)  */
+      500: { row: 0, mask: 0x01, type: 'key', layoutRowOrder: 39, inner1: 'CAPS SHIFT', shift: true, oneAction: true, gridColumn: '1 / 3', gridRow: '4' }, /* CAPS SHIFT LEFT (Shift PC Key) */
+      226: { row: 3, mask: 0x02, shiftKey: 16, type: 'key', layoutRowOrder: 40, inner1: 'CAPS LOCK', oneAction: true, lock: true }, /* CAPS LOCK (<> PC Key)  */
       90: { row: 0, mask: 0x02, type: 'key', layoutRowOrder: 41, inner1: 'Z', inner2: ":" }, /* Z (Z PC Key) */
       88: { row: 0, mask: 0x04, type: 'key', layoutRowOrder: 42, inner1: 'X', inner2: "&pound;" }, /* X (X PC Key) */
       67: { row: 0, mask: 0x08, type: 'key', layoutRowOrder: 43, inner1: 'C', inner2: '?' }, /* C (C PC Key) */
@@ -56,13 +56,13 @@ export class spectrum128p2KeyboardMap {
       17: { row: 7, mask: 0x02, type: 'key', layoutRowOrder: 50, inner1: 'SYMB<br/>SHIFT', shift: true, oneAction: true }, /* SYMB SHIF (CTRL PC Key) */
       189: { row: 5, mask: 0x02, shiftKey: 17, type: 'key', layoutRowOrder: 51, inner1: ';' }, /* ; (- PC key)*/
       222: { row: 5, mask: 0x01, shiftKey: 17, type: 'key', layoutRowOrder: 52, inner1: '"' }, /* " (´ PC key)*/
-      37: { row: 3, mask: 0x10, shiftKey: 226, type: 'key', layoutRowOrder: 53, inner1: '&#129144;' }, /* Left arrow (Left arrow PC Key) */
-      39: { row: 4, mask: 0x04, shiftKey: 226, type: 'key', layoutRowOrder: 54, inner1: '&#129146;' }, /* Right arrow (Right arrow PC Key) */
+      37: { row: 3, mask: 0x10, shiftKey: 16, type: 'key', layoutRowOrder: 53, inner1: '&#129144;' }, /* Left arrow (Left arrow PC Key) */
+      39: { row: 4, mask: 0x04, shiftKey: 16, type: 'key', layoutRowOrder: 54, inner1: '&#129146;' }, /* Right arrow (Right arrow PC Key) */
       32: { row: 7, mask: 0x01, type: 'key', layoutRowOrder: 55, oneAction: true, gridColumn: '6 / 10' }, /* space (Space PC Key) */
-      38: { row: 4, mask: 0x08, shiftKey: 226, type: 'key', layoutRowOrder: 56, inner1: '&#129145;' }, /* Up arrow (Up arrow PC Key) */
-      40: { row: 4, mask: 0x10, shiftKey: 226, type: 'key', layoutRowOrder: 57, inner1: '&#129147;' }, /* Down arrow (Down arrow PC Key) */
+      38: { row: 4, mask: 0x08, shiftKey: 16, type: 'key', layoutRowOrder: 56, inner1: '&#129145;' }, /* Up arrow (Up arrow PC Key) */
+      40: { row: 4, mask: 0x10, shiftKey: 16, type: 'key', layoutRowOrder: 57, inner1: '&#129147;' }, /* Down arrow (Down arrow PC Key) */
       188: { row: 7, mask: 0x08, shiftKey: 17, type: 'key', layoutRowOrder: 58, inner1: ',' }, /* " */
-      513: { row: 7, mask: 0x02, type: 'key', layoutRowOrder: 59, inner1: 'SYMB<br/>SHIFT', shift: true, oneAction: true }, /* SYMB SHIF (CTRL PC Key) */
+      501: { row: 7, mask: 0x02, type: 'key', layoutRowOrder: 59, inner1: 'SYMB<br/>SHIFT', shift: true, oneAction: true }, /* SYMB SHIF (CTRL PC Key) */
     };
   };
   getKeyCodes() {

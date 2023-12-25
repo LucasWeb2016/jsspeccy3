@@ -30,11 +30,11 @@ export class SupportedMachines {
           "rom0": "roms\/48.rom",
           "rom0_page": 8,
         },
-        "status": 2,
+        "status": 1,
         "manufacturer": "Sinclair Research",
         "style": "spectrum48",
         "worker": "zxspectrum-worker.js",
-        "comments": "Expansion and joystick not yet emulated",
+        "comments": "Working machine",
         "family": "ZX Spectrum",
       },
       "2": {
@@ -66,11 +66,11 @@ export class SupportedMachines {
           "rom0": "roms\/48-spanish.rom",
           "rom0_page": 8,
         },
-        "status": 2,
+        "status": 1,
         "manufacturer": "Sinclair Research",
         "style": "spectrum48",
         "worker": "zxspectrum-worker.js",
-        "comments": "Expansion and joystick not yet emulated",
+        "comments": "Working machine",
         "family": "ZX Spectrum"
       },
       "14": {
@@ -102,11 +102,11 @@ export class SupportedMachines {
           "rom0": "roms\/48-beckman.rom",
           "rom0_page": 8,
         },
-        "status": 2,
+        "status": 1,
         "manufacturer": "Beckman Innovation AB",
         "style": "spectrum48",
         "worker": "zxspectrum-worker.js",
-        "comments": "Expansion and joystick not yet emulated",
+        "comments": "Working machine",
         "family": "ZX Spectrum"
       },
       "3": {
@@ -128,7 +128,7 @@ export class SupportedMachines {
           "isPentagonBased": 0,
           "memoryPageReadMap": 8,
           "pagingLocked": 0,
-          "keyboard": "default"
+          "keyboard": "spectrum128p"
         },
         "tapeloaders": {
           "default": "tapeloaders\/tape_128.szx",
@@ -140,11 +140,11 @@ export class SupportedMachines {
           "rom1": "roms\/128-1.rom",
           "rom1_page": 9,
         },
-        "status": 2,
+        "status": 1,
         "manufacturer": "Sinclair Research",
         "style": "spectrum128p",
         "worker": "zxspectrum-worker.js",
-        "comments": "Expansion and joystick not yet emulated",
+        "comments": "Working machine",
         "family": "ZX Spectrum"
       },
       "4": {
@@ -166,7 +166,7 @@ export class SupportedMachines {
           "isPentagonBased": 0,
           "memoryPageReadMap": 8,
           "pagingLocked": 0,
-          "keyboard": "default"
+          "keyboard": "spectrum128pes"
         },
         "tapeloaders": {
           "default": false,
@@ -178,11 +178,11 @@ export class SupportedMachines {
           "rom1": "roms\/128-spanish-1.rom",
           "rom1_page": 9,
         },
-        "status": 2,
+        "status": 1,
         "manufacturer": "Sinclair Research",
-        "style": "spectrum128p",
+        "style": "spectrum128pes",
         "worker": "zxspectrum-worker.js",
-        "comments": "Expansion and joystick not yet emulated",
+        "comments": "Working machine",
         "family": "ZX Spectrum"
       },
       "5": {
@@ -242,7 +242,7 @@ export class SupportedMachines {
           "isPentagonBased": 0,
           "memoryPageReadMap": 8,
           "pagingLocked": 0,
-          "keyboard": "default"
+          "keyboard": "spectrum128p2"
         },
         "tapeloaders": {
           "default": "tapeloaders\/tape_plus2.szx",
@@ -280,7 +280,7 @@ export class SupportedMachines {
           "isPentagonBased": 0,
           "memoryPageReadMap": 8,
           "pagingLocked": 0,
-          "keyboard": "default"
+          "keyboard": "spectrum128p2"
         },
         "tapeloaders": {
           "default": "tapeloaders\/tape_plus2.szx",
@@ -1616,11 +1616,11 @@ export class SupportedMachines {
           "rom0": "roms\/48-arabicv1.rom",
           "rom0_page": 8,
         },
-        "status": 2,
+        "status": 1,
         "manufacturer": "Sinclair Egypt",
         "style": "spectrum48",
         "worker": "zxspectrum-worker.js",
-        "comments": "Expansion and joystick not yet emulated",
+        "comments": "Working machine",
         "family": "ZX Spectrum"
       },
       "45": {
@@ -1652,11 +1652,11 @@ export class SupportedMachines {
           "rom0": "roms\/48-arabicv2.rom",
           "rom0_page": 8,
         },
-        "status": 2,
+        "status": 1,
         "manufacturer": "Sinclair Egypt",
         "style": "spectrum48",
         "worker": "zxspectrum-worker.js",
-        "comments": "Expansion and joystick not yet emulated",
+        "comments": "Working machine",
         "family": "ZX Spectrum"
       },
       "46": {
@@ -1688,11 +1688,11 @@ export class SupportedMachines {
           "rom0": "roms\/48-arabicv31.rom",
           "rom0_page": 8,
         },
-        "status": 2,
+        "status": 1,
         "manufacturer": "Sinclair Egypt",
         "style": "spectrum48",
         "worker": "zxspectrum-worker.js",
-        "comments": "Expansion and joystick not yet emulated",
+        "comments": "Working machine",
         "family": "ZX Spectrum"
       },
       "47": {
@@ -2607,7 +2607,7 @@ export class SupportedMachines {
       },
       "72": {
         "model": "ZX Spectrum Prototype",
-        "year": "1985",
+        "year": "1982",
         "type": "Original",
         "country": "UK",
         "lang": "EN",
@@ -2634,11 +2634,11 @@ export class SupportedMachines {
           "rom0": "roms\/48-prototype.rom",
           "rom0_page": 8,
         },
-        "status": 2,
+        "status": 1,
         "manufacturer": "Sinclair Research",
         "style": "spectrum48",
         "worker": "zxspectrum-worker.js",
-        "comments": "Expansion and joystick not yet emulated",
+        "comments": "Working machine",
         "family": "ZX Spectrum"
       },
       "74": {
@@ -3073,42 +3073,42 @@ export class SupportedMachines {
         "comments": "QC 2.6 Mac Buster. Boot menu options fails.",
         "family": "ZX Spectrum"
       },
-      "85": {
-        "model": "Unipolbrit Komputer 2086",
-        "year": "1989",
-        "type": "Licensed",
-        "country": "Poland",
-        "lang": "PO",
-        "tech": {
-          "clockspeed": 3528000,
-          "ram": 48,
-          "frameCycleCount": 69888,
-          "mainScreenStartTstate": 14335,
-          "tstatesPerRow": 224,
-          "borderTimeMask": 0xfc,
-          "buildContentionTable": 1,
-          "betadiskEnabled": 0,
-          "betadiskROMActive": 0,
-          "isPentagonBased": 0,
-          "memoryPageReadMap": 8,
-          "pagingLocked": 1,
-          "keyboard": "default"
-        },
-        "tapeloaders": {
-          "default": false,
-          "usr0": false
-        },
-        "roms": {
-          "rom0": false,
-          "rom0_page": false,
-        },
-        "status": 0,
-        "manufacturer": "Timex Corp",
-        "style": "unipol2068",
-        "worker": "zxspectrum-worker.js",
-        "comments": "Missing roms...",
-        "family": "ZX Spectrum"
-      },
+      // "85": {
+      //   "model": "Unipolbrit Komputer 2086",
+      //   "year": "1989",
+      //   "type": "Licensed",
+      //   "country": "Poland",
+      //   "lang": "PO",
+      //   "tech": {
+      //     "clockspeed": 3528000,
+      //     "ram": 48,
+      //     "frameCycleCount": 69888,
+      //     "mainScreenStartTstate": 14335,
+      //     "tstatesPerRow": 224,
+      //     "borderTimeMask": 0xfc,
+      //     "buildContentionTable": 1,
+      //     "betadiskEnabled": 0,
+      //     "betadiskROMActive": 0,
+      //     "isPentagonBased": 0,
+      //     "memoryPageReadMap": 8,
+      //     "pagingLocked": 1,
+      //     "keyboard": "default"
+      //   },
+      //   "tapeloaders": {
+      //     "default": false,
+      //     "usr0": false
+      //   },
+      //   "roms": {
+      //     "rom0": false,
+      //     "rom0_page": false,
+      //   },
+      //   "status": 0,
+      //   "manufacturer": "Timex Corp",
+      //   "style": "unipol2068",
+      //   "worker": "zxspectrum-worker.js",
+      //   "comments": "Missing roms...",
+      //   "family": "ZX Spectrum"
+      // },
       "86": {
         "model": "Quorum / &#1050;&#1074;&#1086;&#1088;&#1091;&#1084; 128 v4.2",
         "year": "1995",

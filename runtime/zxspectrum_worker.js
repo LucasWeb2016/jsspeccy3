@@ -3,6 +3,8 @@ import { SupportedMachines } from './machines.js';
 import { TAPFile, TZXFile } from './tape.js';
 
 import { spectrum48KeyboardMap } from './keyboardMaps/spectrum48.js';
+import { spectrum128pKeyboardMap } from './keyboardMaps/spectrum128p.js';
+import { spectrum128pesKeyboardMap } from './keyboardMaps/spectrum128pes.js';
 import { spectrum128p2KeyboardMap } from './keyboardMaps/spectrum128p2.js';
 
 let core = null;
@@ -218,6 +220,10 @@ onmessage = (e) => {
             const machineKeyboard = supportedMachines.getList()[e.data.type]['tech']['keyboard'];
             if (machineKeyboard == 'spectrum128p2') {
                 currentKeyboardMap = new spectrum128p2KeyboardMap().getKeyCodes();
+            } else if (machineKeyboard == 'spectrum128pes') {
+                currentKeyboardMap = new spectrum128pesKeyboardMap().getKeyCodes();
+            } else if (machineKeyboard == 'spectrum128p') {
+                currentKeyboardMap = new spectrum128pKeyboardMap().getKeyCodes();
             } else {
                 currentKeyboardMap = new spectrum48KeyboardMap().getKeyCodes();
             }

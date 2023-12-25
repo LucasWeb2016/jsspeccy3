@@ -1,5 +1,7 @@
 import EventEmitter from 'events';
 import { spectrum48KeyboardMap } from './keyboardMaps/spectrum48.js';
+import { spectrum128pKeyboardMap } from './keyboardMaps/spectrum128p.js';
+import { spectrum128pesKeyboardMap } from './keyboardMaps/spectrum128pes.js';
 import { spectrum128p2KeyboardMap } from './keyboardMaps/spectrum128p2.js';
 
 import playIcon from './icons/play.svg';
@@ -273,8 +275,12 @@ export class inScreenKeyboard {
         }
     }
     updateKeyboard(newKeyboard, onClick) {
-        if (newKeyboard == 'spectrum128p2') {
+        if (newKeyboard == 'spectrum128pes') {
+            this.keyboard = new spectrum128pesKeyboardMap();
+        } else if (newKeyboard == 'spectrum128p2') {
             this.keyboard = new spectrum128p2KeyboardMap();
+        } else if (newKeyboard == 'spectrum128p') {
+            this.keyboard = new spectrum128pKeyboardMap();
         } else {
             this.keyboard = new spectrum48KeyboardMap();
         }
