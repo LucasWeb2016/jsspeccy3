@@ -290,7 +290,7 @@ export class inScreenKeyboard {
         innerContainer.appendChild(row);
         Object.keys(keys).forEach(function (item) {
             let button = document.createElement('div');
-            if (keys[item].hasOwnProperty('oneaction')) {
+            if (keys[item].hasOwnProperty('oneAction')) {
                 button.classList.add('one-action-key');
             }
             if (keys[item].hasOwnProperty('shift')) {
@@ -312,16 +312,8 @@ export class inScreenKeyboard {
             button.appendChild(top2);
             let innerButton = document.createElement('div');
             innerButton.setAttribute('data-id', keys[item].id);
-            innerButton.setAttribute('data-row', keys[item].row);
-            innerButton.setAttribute('data-mask', keys[item].mask);
-            if (keys[item].hasOwnProperty('lock') && keys[item].lock === true) {
-                innerButton.setAttribute('data-lock', keys[item].lock);
-            }
-            if (keys[item].hasOwnProperty('capshift') && keys[item].capshift === true) {
-                innerButton.setAttribute('data-caps', keys[item].capshift);
-            }
-            if (keys[item].hasOwnProperty('symshift') && keys[item].symshift === true) {
-                innerButton.setAttribute('data-sym', keys[item].symshift);
+            if (keys[item].hasOwnProperty('shiftKey') && keys[item].shiftKey) {
+                innerButton.setAttribute('data-shiftKey', keys[item].shiftKey);
             }
             if (keys[item].hasOwnProperty('shift')) {
                 innerButton.setAttribute('data-shift', keys[item].shift);

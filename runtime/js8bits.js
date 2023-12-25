@@ -137,7 +137,10 @@ class Emulator extends EventEmitter {
                     this.emit('stoppedTape');
                     break;
                 case 'machineSetupDone':
-                    if (this.devMode) console.log('WORKER MESSAGE - MACHINE SETUP DONE');
+                    if (this.devMode) {
+                        console.log('WORKER MESSAGE - MACHINE SETUP DONE');
+                        console.log(e.data);
+                    }
                     break;
                 default:
                     if (this.devMode) {
@@ -312,100 +315,91 @@ class Emulator extends EventEmitter {
             return;
         }
         let target = evt.target;
-        if (!target.hasAttribute('data-row')) {
+        if (!target.hasAttribute('data-id')) {
             target = target.parentNode;
         }
 
         const id = target.getAttribute('data-id');
-        const row = target.getAttribute('data-row');
-        const mask = target.getAttribute('data-mask');
         const isShift = target.getAttribute('data-shift') == 'true' ? true : false;
-        const caps = target.getAttribute('data-caps') == 'true' ? true : false;
-        const sym = target.getAttribute('data-sym') == 'true' ? true : false;
-        const lock = target.getAttribute('data-lock') == 'true' ? true : false;
+        const shiftKey = target.getAttribute('data-shiftKey') ? target.getAttribute('data-shiftKey') : false;
 
-        if (lock) {
-            console.log('LOCK KEY');
-            if (this.inScreenKeyboardLocked && id == this.inScreenKeyboardLocked.getAttribute('data-id')) {
-                target.classList.remove('pushed');
-                this.inScreenKeyboardBuffer = null;
-            } else {
-                this.inScreenKeyboardBuffer = target;
-                target.classList.remove('pushed');
-            }
-        } else if (isShift) {
-            console.log('SHIFT KEY');
-            target.classList.add('pushed');
-            this.inScreenKeyboardBuffer = target;
-        } else if (this.inScreenKeyboardBuffer) {
-            console.log('AFTER LOCK/SHIFT KEY');
-            let shiftMask = this.inScreenKeyboardBuffer.getAttribute('data-mask');
-            let shiftRow = this.inScreenKeyboardBuffer.getAttribute('data-row');
+        if (this.devMode) {
+            console.log('IN SCREEN KEYBOARD CLICK');
+            console.log('KeyID:' + id);
+            console.log('isShift:' + isShift);
+            console.log('shiftKey:' + shiftKey);
+        }
 
-            this.worker.postMessage({
-                message: 'keyDown', row: Number(shiftRow), mask: Number(shiftMask),
-            });
-            await new Promise(r => setTimeout(r, 150));
-            this.worker.postMessage({
-                message: 'keyDown', row: Number(row), mask: Number(mask),
-            });
-            await new Promise(r => setTimeout(r, 150));
-            this.worker.postMessage({
-                message: 'keyUp', row: Number(row), mask: Number(mask),
-            });
-            await new Promise(r => setTimeout(r, 150));
-            this.worker.postMessage({
-                message: 'keyUp', row: Number(shiftRow), mask: Number(shiftMask),
-            });
-
-            if (this.inScreenKeyboardBuffer.getAttribute('data-shift')) {
+        if (isShift) {
+            if (this.devMode) console.log('IS SHIFT KEY');
+            if (this.inScreenKeyboardBuffer) {
+                if (this.devMode) console.log('IS DOBLE SHIFT!');
+                this.worker.postMessage({
+                    message: 'keyDown', id: Number(this.inScreenKeyboardBuffer.getAttribute('data-id')),
+                });
+                await new Promise(r => setTimeout(r, 150));
+                this.worker.postMessage({
+                    message: 'keyDown', id: Number(id),
+                });
+                await new Promise(r => setTimeout(r, 150));
+                this.worker.postMessage({
+                    message: 'keyUp', id: Number(id),
+                });
+                await new Promise(r => setTimeout(r, 150));
+                this.worker.postMessage({
+                    message: 'keyUp', id: Number(this.inScreenKeyboardBuffer.getAttribute('data-id')),
+                });
                 this.inScreenKeyboardBuffer.classList.remove('pushed');
                 this.inScreenKeyboardBuffer = null;
+            } else {
+                target.classList.add('pushed')
+                this.inScreenKeyboardBuffer = target;
             }
-        } else if (caps) {
-            console.log('KEY WITH CAPS SHIFT');
+        } else if (this.inScreenKeyboardBuffer) {
+            if (this.devMode) console.log('IS AFTER SHIFT KEY');
             this.worker.postMessage({
-                message: 'keyDown', row: Number(0), mask: Number(1),
+                message: 'keyDown', id: Number(this.inScreenKeyboardBuffer.getAttribute('data-id')),
             });
             await new Promise(r => setTimeout(r, 150));
             this.worker.postMessage({
-                message: 'keyDown', row: Number(row), mask: Number(mask),
+                message: 'keyDown', id: Number(id),
             });
             await new Promise(r => setTimeout(r, 150));
             this.worker.postMessage({
-                message: 'keyUp', row: Number(row), mask: Number(mask),
+                message: 'keyUp', id: Number(id),
             });
             await new Promise(r => setTimeout(r, 150));
             this.worker.postMessage({
-                message: 'keyUp', row: Number(0), mask: Number(1),
+                message: 'keyUp', id: Number(this.inScreenKeyboardBuffer.getAttribute('data-id')),
             });
+            this.inScreenKeyboardBuffer.classList.remove('pushed');
             this.inScreenKeyboardBuffer = null;
-        } else if (sym) {
-            console.log('KEY WITH SYM SHIFT');
+        } else if (shiftKey) {
+            if (this.devMode) console.log('IS A SHIFTED KEY');
             this.worker.postMessage({
-                message: 'keyDown', row: Number(7), mask: Number(0x02),
+                message: 'keyDown', id: shiftKey
             });
             await new Promise(r => setTimeout(r, 150));
             this.worker.postMessage({
-                message: 'keyDown', row: Number(row), mask: Number(mask),
+                message: 'keyDown', id: Number(id),
             });
             await new Promise(r => setTimeout(r, 150));
             this.worker.postMessage({
-                message: 'keyUp', row: Number(row), mask: Number(mask),
+                message: 'keyUp', id: Number(id)
             });
             await new Promise(r => setTimeout(r, 150));
             this.worker.postMessage({
-                message: 'keyUp', row: Number(7), mask: Number(0x02),
+                message: 'keyUp', id: shiftKey
             });
             this.inScreenKeyboardBuffer = null;
         } else {
-            console.log('KEY');
+            if (this.devMode) console.log('IS COMMON KEY');
             this.worker.postMessage({
-                message: 'keyDown', row: Number(row), mask: Number(mask),
+                message: 'keyDown', id: id,
             });
             await new Promise(r => setTimeout(r, 150));
             this.worker.postMessage({
-                message: 'keyUp', row: Number(row), mask: Number(mask),
+                message: 'keyUp', id: id,
             });
             this.inScreenKeyboardBuffer = null;
         }

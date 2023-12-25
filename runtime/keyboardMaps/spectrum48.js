@@ -48,15 +48,15 @@ export class spectrum48KeyboardMap {
       78: { row: 7, mask: 0x08, type: 'key', layoutRowOrder: 37, top2: 'INKEY$', inner1: 'N', inner2: ",", inner3: 'NEXT', bottom: 'OVER' }, /* N */
       77: { row: 7, mask: 0x04, type: 'key', layoutRowOrder: 38, top2: 'PI', inner1: 'M', inner2: ".", inner3: 'PAUSE', bottom: 'INVERSE' }, /* M */
       17: { row: 7, mask: 0x02, type: 'key', layoutRowOrder: 39, inner1: 'SYM<br/>SHIFT', shift: true, oneaction:true }, /* sym - gah, firefox screws up ctrl+key too */
-      32: { row: 7, mask: 0x01, type: 'key', layoutRowOrder: 40, inner1: 'BREAK<br/>SPACE', oneaction:true }, /* space */
+      32: { row: 7, mask: 0x01, type: 'key', layoutRowOrder: 40, inner1: 'BREAK<br/>SPACE', oneaction: true }, /* space */
 
-      /* shifted combinations */
+      /* extra - shifted combinations for using common existing PC Keys */
       192: { row: 0, mask: 0x01, type: 'workaroud' }, /* backtick as caps - because firefox screws up a load of key codes when pressing shift */
-      8: { row: 4, mask: 0x01, caps: true, type: 'workaroud' }, /* backspace => caps + 0 */
-      37: { row: 3, mask: 0x10, caps: true, type: 'workaroud'}, /* left arrow => caps + 5 */
-      38: { row: 4, mask: 0x08, caps: true, type: 'workaroud'}, /* up arrow => caps + 7 */
-      39: { row: 4, mask: 0x04, caps: true, type: 'workaroud'}, /* right arrow => caps + 8 */
-      40: { row: 4, mask: 0x10, caps: true, type: 'workaroud' }, /* down arrow => caps + 6 */
+      8: { row: 4, mask: 0x01, shiftKey: 16, type: 'workaroud' }, /* backspace => caps + 0 */
+      37: { row: 3, mask: 0x10, shiftKey: 16, type: 'workaroud'}, /* left arrow => caps + 5 */
+      38: { row: 4, mask: 0x08, shiftKey: 16, type: 'workaroud'}, /* up arrow => caps + 7 */
+      39: { row: 4, mask: 0x04, shiftKey: 16, type: 'workaroud'}, /* right arrow => caps + 8 */
+      40: { row: 4, mask: 0x10, shiftKey: 16, type: 'workaroud' }, /* down arrow => caps + 6 */
     };
   };
   getKeyCodes() {
