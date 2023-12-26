@@ -220,7 +220,7 @@ export class SupportedMachines {
         "manufacturer": "Amstrad / Sinclair",
         "style": "spectrum128p2",
         "worker": "zxspectrum-worker.js",
-        "comments": "Expansion and joystick not yet emulated",
+        "comments": "Working machine. Pending Joystick.",
         "family": "ZX Spectrum"
       },
       "6": {
@@ -258,7 +258,7 @@ export class SupportedMachines {
         "manufacturer": "Amstrad / Sinclair",
         "style": "spectrum128p2",
         "worker": "zxspectrum-worker.js",
-        "comments": "Expansion and joystick not yet emulated",
+        "comments": "Working machine. Pending Joystick.",
         "family": "ZX Spectrum"
       },
       "7": {
@@ -296,7 +296,7 @@ export class SupportedMachines {
         "manufacturer": "Amstrad / Sinclair",
         "style": "spectrum128p2",
         "worker": "zxspectrum-worker.js",
-        "comments": "Expansion and joystick not yet emulated",
+        "comments": "Working machine. Pending Joystick.",
         "family": "ZX Spectrum"
       },
       "8": {
@@ -1306,7 +1306,7 @@ export class SupportedMachines {
           "isPentagonBased": 0,
           "memoryPageReadMap": 0,
           "pagingLocked": 0,
-          "keyboard": "default"
+          "keyboard": "spectrum128p2"
         },
         "tapeloaders": {
           "default": false,
@@ -1348,7 +1348,7 @@ export class SupportedMachines {
           "isPentagonBased": 0,
           "memoryPageReadMap": 0,
           "pagingLocked": 0,
-          "keyboard": "default"
+          "keyboard": "spectrum128p2"
         },
         "tapeloaders": {
           "default": false,
@@ -1384,7 +1384,7 @@ export class SupportedMachines {
           "isPentagonBased": 0,
           "memoryPageReadMap": 0,
           "pagingLocked": 0,
-          "keyboard": "default"
+          "keyboard": "spectrum128p2"
         },
         "tapeloaders": {
           "default": false,
@@ -1420,7 +1420,7 @@ export class SupportedMachines {
           "isPentagonBased": 0,
           "memoryPageReadMap": 0,
           "pagingLocked": 0,
-          "keyboard": "default"
+          "keyboard": "spectrum128p2"
         },
         "tapeloaders": {
           "default": false,
@@ -1456,7 +1456,7 @@ export class SupportedMachines {
           "isPentagonBased": 0,
           "memoryPageReadMap": 0,
           "pagingLocked": 0,
-          "keyboard": "default"
+          "keyboard": "spectrum128p2"
         },
         "tapeloaders": {
           "default": false,
@@ -1498,7 +1498,7 @@ export class SupportedMachines {
           "isPentagonBased": 0,
           "memoryPageReadMap": 0,
           "pagingLocked": 0,
-          "keyboard": "default"
+          "keyboard": "spectrum128p2"
         },
         "tapeloaders": {
           "default": false,
@@ -1534,7 +1534,7 @@ export class SupportedMachines {
           "isPentagonBased": 0,
           "memoryPageReadMap": 0,
           "pagingLocked": 0,
-          "keyboard": "default"
+          "keyboard": "spectrum128p2"
         },
         "tapeloaders": {
           "default": false,
@@ -1570,7 +1570,7 @@ export class SupportedMachines {
           "isPentagonBased": 0,
           "memoryPageReadMap": 0,
           "pagingLocked": 0,
-          "keyboard": "default"
+          "keyboard": "spectrum128p2"
         },
         "tapeloaders": {
           "default": false,
@@ -1616,11 +1616,11 @@ export class SupportedMachines {
           "rom0": "roms\/48-arabicv1.rom",
           "rom0_page": 8,
         },
-        "status": 1,
+        "status": 2,
         "manufacturer": "Sinclair Egypt",
         "style": "spectrum48",
         "worker": "zxspectrum-worker.js",
-        "comments": "Working machine",
+        "comments": "Working machine. Pending keyboard.",
         "family": "ZX Spectrum"
       },
       "45": {
@@ -1652,11 +1652,11 @@ export class SupportedMachines {
           "rom0": "roms\/48-arabicv2.rom",
           "rom0_page": 8,
         },
-        "status": 1,
+        "status": 2,
         "manufacturer": "Sinclair Egypt",
         "style": "spectrum48",
         "worker": "zxspectrum-worker.js",
-        "comments": "Working machine",
+        "comments": "Working machine. Pending keyboard.",
         "family": "ZX Spectrum"
       },
       "46": {
@@ -1688,11 +1688,11 @@ export class SupportedMachines {
           "rom0": "roms\/48-arabicv31.rom",
           "rom0_page": 8,
         },
-        "status": 1,
+        "status": 2,
         "manufacturer": "Sinclair Egypt",
         "style": "spectrum48",
         "worker": "zxspectrum-worker.js",
-        "comments": "Working machine",
+        "comments": "Working machine. Pending keyboard.",
         "family": "ZX Spectrum"
       },
       "47": {

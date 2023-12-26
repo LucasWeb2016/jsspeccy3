@@ -433,6 +433,8 @@ export class UIController extends EventEmitter {
         this.container = container;
         this.canvas = emulator.canvas;
         this.uiEnabled = ('uiEnabled' in opts) ? opts.uiEnabled : true;
+        this.standAlone = ('standAlone' in opts) ? opts.standAlone : false;
+        this.devMode = ('devMode' in opts) ? opts.devMode : false;
 
         /* build UI elements */
         if (this.uiEnabled) {
@@ -603,35 +605,60 @@ export class UIController extends EventEmitter {
             document.exitFullscreen();
             return;
         }
-        let displayWidth = 320;
-        let displayHeight = 240;
-        if (factor == 'fit') {
-            if ((this.container.clientWidth / (this.container.clientHeight - 84)) > (320/240)) {
-                displayHeight = (this.container.clientHeight - 84);
-                displayWidth = Math.ceil((240 * displayHeight) / 320);
+        let displayHeight = 320;
+        let displayWidth = 240;
+        if(this.standAlone) {
+            this.container.classList.add('standalone');
+            let windowHeight = window.innerHeight || document.documentElement.clientHeight;
+            let windowWidth = window.innerWidth || document.documentElement.clientWidth;
+            let canvasMaxWidth = windowWidth;
+            let canvasMaxHeight = windowHeight - 84;
+            if(windowWidth > windowHeight) {
+                displayHeight = canvasMaxHeight;
+                displayWidth = Math.ceil((320 * displayHeight) / 240);
             } else {
-                displayWidth = this.container.clientWidth;
-                displayHeight = Math.ceil((320 * displayWidth) / 240);
+                displayWidth = canvasMaxWidth;
+                displayHeight = Math.ceil((240 * displayWidth) / 320);
             }
 
             addEventListener("resize", (event) => {
-                if ((this.container.clientWidth / (this.container.clientHeight - 84)) > (320 / 240)) {
-                    displayWidth = this.container.clientWidth;
-                    displayHeight = Math.ceil((320 * displayWidth) / 240);
+                windowHeight = window.innerHeight || document.documentElement.clientHeight;
+                windowWidth = window.innerWidth || document.documentElement.clientWidth;
+                canvasMaxWidth = windowWidth;
+                canvasMaxHeight = windowHeight - 84;
+                if (windowWidth > windowHeight) {
+                    displayHeight = canvasMaxHeight;
+                    displayWidth = Math.ceil((320 * displayHeight) / 240);
                 } else {
-                    displayHeight = (this.container.clientHeight - 84);
-                    displayWidth = Math.ceil((240 * displayHeight) / 320);
+                    displayWidth = canvasMaxWidth;
+                    displayHeight = Math.ceil((240 * displayWidth) / 320);
                 }
                 this.canvas.style.width = '' + displayWidth + 'px';
                 this.canvas.style.height = '' + displayHeight + 'px';
+                this.container.style.height = '' + (displayHeight + 84) + 'px';
                 this.emit('setZoom', factor);
             });
         } else {
-            this.zoom = factor;
-            displayWidth = 320 * this.zoom;
-            displayHeight = 240 * this.zoom;
-        }
+            if (factor == 'fit') {
+                displayWidth = this.container.clientWidth;
+                displayHeight = Math.ceil((240 * displayWidth) / 320);
+                this.container.style.height = '' + (displayHeight + 84) + 'px';
 
+                addEventListener("resize", (event) => {
+                    displayWidth = this.container.clientWidth;
+                    displayHeight = Math.ceil((240 * displayWidth) / 320);
+                    this.canvas.style.width = '' + displayWidth + 'px';
+                    this.canvas.style.height = '' + displayHeight + 'px';
+                    this.container.style.height = '' + (displayHeight + 84) + 'px';
+                    console.log('Initial canvas size : ' + displayWidth + 'x' + displayHeight);
+                    this.emit('setZoom', factor);
+                });
+            } else {
+                this.zoom = factor;
+                displayWidth = 320 * this.zoom;
+                displayHeight = 240 * this.zoom;
+            }
+        }
         this.canvas.style.width = '' + displayWidth + 'px';
         this.canvas.style.height = '' + displayHeight + 'px';
         this.canvas.style.margin = 'auto';

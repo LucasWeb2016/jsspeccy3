@@ -548,7 +548,8 @@ window.js8bits = (container, opts) => {
     const supportedMachines = new SupportedMachines();
     const keyboardEnabled = ('keyboardEnabled' in opts) ? opts.keyboardEnabled : true;
     const inScreenKeyboardEnabled = ('inScreenKeyboardEnabled' in opts) ? opts.inScreenKeyboardEnabled : true;
-    const devMode = ('devbugMode' in opts) ? opts.devMode : true;
+    const devMode = ('devMode' in opts) ? opts.devMode : false;
+    const standAlone = ('standAlone' in opts) ? opts.standAlone : false;
     const uiEnabled = ('uiEnabled' in opts) ? opts.uiEnabled : true;
 
     // Emulator
@@ -569,6 +570,8 @@ window.js8bits = (container, opts) => {
         zoom: opts.zoom || 'fit',
         sandbox: opts.sandbox,
         uiEnabled: uiEnabled,
+        devMode: devMode,
+        standAlone: standAlone
     });
 
     // deviceClass
@@ -610,12 +613,14 @@ window.js8bits = (container, opts) => {
         const machineItem = machineMenu.addDataHeader();
         const orderedMachines = supportedMachines.getOrderedList();
         Object.keys(orderedMachines).forEach(function (item) {
-            const machineItem = machineMenu.addDataItem(orderedMachines[item], () => {
-                emu.setMachine(orderedMachines[item]['id']);
-                machineItem.setActive();
-                machineMenu.setInactiveExcept(orderedMachines[item]['id']);
-                emu.focus();
-            }, orderedMachines[item]['id']);
+            if (orderedMachines[item]['status'] >= 1 || (orderedMachines[item]['status']==0 && devMode)) {
+                const machineItem = machineMenu.addDataItem(orderedMachines[item], () => {
+                    emu.setMachine(orderedMachines[item]['id']);
+                    machineItem.setActive();
+                    machineMenu.setInactiveExcept(orderedMachines[item]['id']);
+                    emu.focus();
+                }, orderedMachines[item]['id']);
+            }
         });
         machineMenu.setInactiveExcept(opts.machine || '1');
 

@@ -13,6 +13,7 @@ let memoryData = null;
 let workerFrameData = null;
 let registerPairs = null;
 let tapePulses = null;
+let logEntries = null;
 
 let stopped = false;
 let tape = null;
@@ -26,11 +27,15 @@ const loadCore = (baseUrl) => {
         fetch(new URL('js8bits-core.wasm', baseUrl), {})
     ).then(results => {
         core = results.instance.exports;
+        // core.startLog();
         memory = core.memory;
         memoryData = new Uint8Array(memory.buffer);
         workerFrameData = memoryData.subarray(core.FRAME_BUFFER, FRAME_BUFFER_SIZE);
         registerPairs = new Uint16Array(core.memory.buffer, core.REGISTERS, 12);
         tapePulses = new Uint16Array(core.memory.buffer, core.TAPE_PULSES, core.TAPE_PULSES_LENGTH);
+        logEntries = new Uint16Array(core.LOG_ENTRIES);
+        // core.stopLog();
+
 
         postMessage({
             'message': 'ready',
@@ -198,6 +203,7 @@ onmessage = (e) => {
             }
             break;
         case 'keyDown':
+            // core.startLog();
             postMessage({
                 message: 'keyDown received',
                 id: Number(e.data.id),
@@ -231,6 +237,7 @@ onmessage = (e) => {
                 message: 'machineSetupDone',
                 keyboard: machineKeyboard
             });
+
             break;
         case 'reset':
             core.reset();
