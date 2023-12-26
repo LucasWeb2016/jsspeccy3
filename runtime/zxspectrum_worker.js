@@ -2,29 +2,40 @@ import { FRAME_BUFFER_SIZE } from './constants.js';
 import { SupportedMachines } from './machines.js';
 import { TAPFile, TZXFile } from './tape.js';
 
+import { spectrum48KeyboardMap } from './keyboardMaps/spectrum48.js';
+import { spectrum128pKeyboardMap } from './keyboardMaps/spectrum128p.js';
+import { spectrum128pesKeyboardMap } from './keyboardMaps/spectrum128pes.js';
+import { spectrum128p2KeyboardMap } from './keyboardMaps/spectrum128p2.js';
+
 let core = null;
 let memory = null;
 let memoryData = null;
 let workerFrameData = null;
 let registerPairs = null;
 let tapePulses = null;
+let logEntries = null;
 
 let stopped = false;
 let tape = null;
 let tapeIsPlaying = false;
 
 const supportedMachines = new SupportedMachines();
+let currentKeyboardMap = null;
 
 const loadCore = (baseUrl) => {
     WebAssembly.instantiateStreaming(
         fetch(new URL('js8bits-core.wasm', baseUrl), {})
     ).then(results => {
         core = results.instance.exports;
+        // core.startLog();
         memory = core.memory;
         memoryData = new Uint8Array(memory.buffer);
         workerFrameData = memoryData.subarray(core.FRAME_BUFFER, FRAME_BUFFER_SIZE);
         registerPairs = new Uint16Array(core.memory.buffer, core.REGISTERS, 12);
         tapePulses = new Uint16Array(core.memory.buffer, core.TAPE_PULSES, core.TAPE_PULSES_LENGTH);
+        logEntries = new Uint16Array(core.LOG_ENTRIES);
+        // core.stopLog();
+
 
         postMessage({
             'message': 'ready',
@@ -192,26 +203,41 @@ onmessage = (e) => {
             }
             break;
         case 'keyDown':
-            core.keyDown(e.data.row, e.data.mask);
+            // core.startLog();
             postMessage({
                 message: 'keyDown received',
-                row: e.data.row,
-                mask: e.data.mask,
+                id: Number(e.data.id),
+                row: currentKeyboardMap[e.data.id]['row'],
+                mask: currentKeyboardMap[e.data.id]['mask'],
             });
+            core.keyDown(currentKeyboardMap[Number(e.data.id)]['row'], currentKeyboardMap[Number(e.data.id)]['mask']);
             break;
         case 'keyUp':
-            core.keyUp(e.data.row, e.data.mask);
             postMessage({
                 message: 'keyUp received',
-                row: e.data.row,
-                mask: e.data.mask,
+                id: Number(e.data.id),
+                row: currentKeyboardMap[e.data.id]['row'],
+                mask: currentKeyboardMap[e.data.id]['mask'],
             });
+            core.keyUp(currentKeyboardMap[Number(e.data.id)]['row'], currentKeyboardMap[Number(e.data.id)]['mask']);
             break;
         case 'setMachineType':
             core.setMachineType(e.data.type, e.data.frameCycleCount, e.data.mainScreenStartTstate, e.data.tstatesPerRow, e.data.borderTimeMask, e.data.buildContentionTable, e.data.betadiskEnabled, e.data.betadiskROMActive, e.data.pagingLocked, e.data.memoryPageReadMap, e.data.isPentagonBased);
+            const machineKeyboard = supportedMachines.getList()[e.data.type]['tech']['keyboard'];
+            if (machineKeyboard == 'spectrum128p2') {
+                currentKeyboardMap = new spectrum128p2KeyboardMap().getKeyCodes();
+            } else if (machineKeyboard == 'spectrum128pes') {
+                currentKeyboardMap = new spectrum128pesKeyboardMap().getKeyCodes();
+            } else if (machineKeyboard == 'spectrum128p') {
+                currentKeyboardMap = new spectrum128pKeyboardMap().getKeyCodes();
+            } else {
+                currentKeyboardMap = new spectrum48KeyboardMap().getKeyCodes();
+            }
             postMessage({
                 message: 'machineSetupDone',
+                keyboard: machineKeyboard
             });
+
             break;
         case 'reset':
             core.reset();

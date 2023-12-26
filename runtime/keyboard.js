@@ -1,4 +1,6 @@
 import { spectrum48KeyboardMap } from './keyboardMaps/spectrum48.js';
+import { spectrum128pKeyboardMap } from './keyboardMaps/spectrum128p.js';
+import { spectrum128pesKeyboardMap } from './keyboardMaps/spectrum128pes.js';
 import { spectrum128p2KeyboardMap } from './keyboardMaps/spectrum128p2.js';
 
 export class KeyboardHandler {
@@ -8,28 +10,26 @@ export class KeyboardHandler {
         this.eventsAreBound = false;
         this.keyboard = keyboard;
         this.devMode = devMode;
-        if (keyboard=='spectrum128p2') {
+        if (keyboard == 'spectrum128pes') {
+            this.keycodes = new spectrum128pesKeyboardMap().getKeyCodes();
+        } else if (keyboard == 'spectrum128p') {
+            this.keycodes = new spectrum128pKeyboardMap().getKeyCodes();
+        } else if (keyboard=='spectrum128p2') {
             this.keycodes = new spectrum128p2KeyboardMap().getKeyCodes();
         } else {
             this.keycodes = new spectrum48KeyboardMap().getKeyCodes();
         }
-
 
         this.keydownHandler = (evt) => {
             const keyCode = this.keycodes[evt.keyCode];
 
             if (keyCode) {
                 this.worker.postMessage({
-                    message: 'keyDown', row: keyCode.row, mask: keyCode.mask
+                    message: 'keyDown', id: evt.keyCode,
                 })
-                if (keyCode.capshift) {
+                if (keyCode.shiftKey) {
                     this.worker.postMessage({
-                        message: 'keyDown', row: 0, mask: 0x01
-                    })
-                }
-                if (keyCode.symshift) {
-                    this.worker.postMessage({
-                        message: 'keyDown', row: 7, mask: 0x02
+                        message: 'keyDown', id: Number(keyCode.shiftKey),
                     })
                 }
             }
@@ -41,16 +41,11 @@ export class KeyboardHandler {
             const keyCode = this.keycodes[evt.keyCode];
             if (keyCode) {
                 this.worker.postMessage({
-                    message: 'keyUp', row: keyCode.row, mask: keyCode.mask,
+                    message: 'keyUp', id: evt.keyCode,
                 })
-                if (keyCode.capshift) {
+                if (keyCode.shiftKey) {
                     this.worker.postMessage({
-                        message: 'keyUp', row: 0, mask: 0x01,
-                    })
-                }
-                if (keyCode.symshift) {
-                    this.worker.postMessage({
-                        message: 'keyUp', row: 7, mask: 0x02
+                        message: 'keyUp', id: Number(keyCode.shiftKey),
                     })
                 }
             }

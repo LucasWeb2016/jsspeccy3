@@ -5,6 +5,7 @@
 @import 'inves';
 @import 'microdigitaltk';
 @import 'spectrum128p';
+@import 'spectrum128pes';
 @import 'spectrum128p2';
 @import 'tc2048';
 
@@ -187,7 +188,6 @@
   // keyboard
   div.js8bits-ui-keyboard {
     display: none;
-    padding: 0px 5px;
 
     &.opened {
       display: block;

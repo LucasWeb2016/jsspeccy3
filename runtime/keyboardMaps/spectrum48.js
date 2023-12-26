@@ -36,10 +36,10 @@ export class spectrum48KeyboardMap {
       74: { row: 6, mask: 0x08, type: 'key', layoutRowOrder: 27, top2: 'VAL', inner1: 'J', inner2: '-', inner3: 'LOAD', bottom: 'VAL$' }, /* J */
       75: { row: 6, mask: 0x04, type: 'key', layoutRowOrder: 28, top2: 'LEN', inner1: 'K', inner2: '+', inner3: 'LIST', bottom: 'SCREEN$' }, /* K */
       76: { row: 6, mask: 0x02, type: 'key', layoutRowOrder: 29, top2: 'USR', inner1: 'L', inner2: '=', inner3: 'LET', bottom: 'ATTR' }, /* L */
-      13: { row: 6, mask: 0x01, type: 'key', layoutRowOrder: 30, inner1: 'ENTER', oneaction:true }, /* enter */
+      13: { row: 6, mask: 0x01, type: 'key', layoutRowOrder: 30, inner1: 'ENTER', oneAction:true }, /* enter */
 
       // Row 3
-      16: { row: 0, mask: 0x01, type: 'key', layoutRowOrder: 31, inner1: 'CAPS<br/>SHIFT', shift: true, oneaction:true }, /* caps */
+      16: { row: 0, mask: 0x01, type: 'key', layoutRowOrder: 31, inner1: 'CAPS<br/>SHIFT', shift: true, oneAction:true }, /* caps */
       90: { row: 0, mask: 0x02, type: 'key', layoutRowOrder: 32, top2: 'LN', inner1: 'Z', inner2: ":", inner3: 'COPY', bottom: 'BEEP' }, /* Z */
       88: { row: 0, mask: 0x04, type: 'key', layoutRowOrder: 33, top2: 'EXP', inner1: 'X', inner2: "&pound;", inner3: 'CLEAR', bottom: 'INK' }, /* X */
       67: { row: 0, mask: 0x08, type: 'key', layoutRowOrder: 34, top2: 'LPRINT', inner1: 'C', inner2: "?", inner3: 'CONT', bottom: 'PAPER' }, /* C */
@@ -47,16 +47,16 @@ export class spectrum48KeyboardMap {
       66: { row: 7, mask: 0x10, type: 'key', layoutRowOrder: 36, top2: 'BIN', inner1: 'B', inner2: "*", inner3: 'BORDER', bottom: 'BRIGHT' }, /* B */
       78: { row: 7, mask: 0x08, type: 'key', layoutRowOrder: 37, top2: 'INKEY$', inner1: 'N', inner2: ",", inner3: 'NEXT', bottom: 'OVER' }, /* N */
       77: { row: 7, mask: 0x04, type: 'key', layoutRowOrder: 38, top2: 'PI', inner1: 'M', inner2: ".", inner3: 'PAUSE', bottom: 'INVERSE' }, /* M */
-      17: { row: 7, mask: 0x02, type: 'key', layoutRowOrder: 39, inner1: 'SYM<br/>SHIFT', shift: true, oneaction:true }, /* sym - gah, firefox screws up ctrl+key too */
-      32: { row: 7, mask: 0x01, type: 'key', layoutRowOrder: 40, inner1: 'BREAK<br/>SPACE', oneaction:true }, /* space */
+      17: { row: 7, mask: 0x02, type: 'key', layoutRowOrder: 39, inner1: 'SYM<br/>SHIFT', shift: true, oneAction:true }, /* sym - gah, firefox screws up ctrl+key too */
+      32: { row: 7, mask: 0x01, type: 'key', layoutRowOrder: 40, inner1: '<span>BREAK</span><br/>SPACE', oneAction: true }, /* space */
 
-      /* shifted combinations */
+      /* extra - shifted combinations for using common existing PC Keys */
       192: { row: 0, mask: 0x01, type: 'workaroud' }, /* backtick as caps - because firefox screws up a load of key codes when pressing shift */
-      8: { row: 4, mask: 0x01, caps: true, type: 'workaroud' }, /* backspace => caps + 0 */
-      37: { row: 3, mask: 0x10, caps: true, type: 'workaroud'}, /* left arrow => caps + 5 */
-      38: { row: 4, mask: 0x08, caps: true, type: 'workaroud'}, /* up arrow => caps + 7 */
-      39: { row: 4, mask: 0x04, caps: true, type: 'workaroud'}, /* right arrow => caps + 8 */
-      40: { row: 4, mask: 0x10, caps: true, type: 'workaroud' }, /* down arrow => caps + 6 */
+      8: { row: 4, mask: 0x01, shiftKey: 16, type: 'workaroud' }, /* backspace => caps + 0 */
+      37: { row: 3, mask: 0x10, shiftKey: 16, type: 'workaroud'}, /* left arrow => caps + 5 */
+      38: { row: 4, mask: 0x08, shiftKey: 16, type: 'workaroud'}, /* up arrow => caps + 7 */
+      39: { row: 4, mask: 0x04, shiftKey: 16, type: 'workaroud'}, /* right arrow => caps + 8 */
+      40: { row: 4, mask: 0x10, shiftKey: 16, type: 'workaroud' }, /* down arrow => caps + 6 */
     };
   };
   getKeyCodes() {
