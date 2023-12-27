@@ -1,5 +1,6 @@
 import { spectrum48KeyboardMap } from './keyboardMaps/spectrum48.js';
 import { spectrum128pKeyboardMap } from './keyboardMaps/spectrum128p.js';
+import { quorum64KeyboardMap } from './keyboardMaps/quorum64.js';
 import { spectrum128pesKeyboardMap } from './keyboardMaps/spectrum128pes.js';
 import { spectrum128p2KeyboardMap } from './keyboardMaps/spectrum128p2.js';
 
@@ -10,7 +11,9 @@ export class KeyboardHandler {
         this.eventsAreBound = false;
         this.keyboard = keyboard;
         this.devMode = devMode;
-        if (keyboard == 'spectrum128pes') {
+        if (keyboard == 'quorum64') {
+            this.keycodes = new quorum64KeyboardMap().getKeyCodes();
+        } else if (keyboard == 'spectrum128pes') {
             this.keycodes = new spectrum128pesKeyboardMap().getKeyCodes();
         } else if (keyboard == 'spectrum128p') {
             this.keycodes = new spectrum128pKeyboardMap().getKeyCodes();

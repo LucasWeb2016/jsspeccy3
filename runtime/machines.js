@@ -946,7 +946,7 @@ export class SupportedMachines {
           "isPentagonBased": 1,
           "memoryPageReadMap": 8,
           "pagingLocked": 1,
-          "keyboard": "quorum"
+          "keyboard": "quorum64"
         },
         "tapeloaders": {
           "default": false,
@@ -958,7 +958,7 @@ export class SupportedMachines {
         },
         "status": 0,
         "manufacturer": "Vector / UOMZ(&#1059;&#1054;&#1052;&#1047;) - Ural Optical-Mechanical Plant",
-        "style": "clone",
+        "style": "quorum64",
         "worker": "zxspectrum-worker.js",
         "comments": "No keyboard. Russified 88 keys not emulated.",
         "family": "ZX Spectrum"

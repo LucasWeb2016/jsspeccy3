@@ -7,7 +7,7 @@
   "scripts": {
     "test": "npm run build && node --experimental-wasm-modules test/test.js test/tests.in test/tests.expected",
     "build:core": "node generator/gencore.js generator/core.ts.in build/core.ts",
-    "build:wasm:debug": "asc build/core.ts --target debug",
+    "build:wasm:debug": "asc build/core.ts --target debug --debug",
     "build:wasm:release": "asc build/core.ts --target release",
     "build:js": "set \"NODE_OPTIONS=--openssl-legacy-provider\" && webpack",
     "build:css": "sass scss/js8bits.scss dist/js8bits/js8bits.css",

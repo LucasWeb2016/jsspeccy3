@@ -450,12 +450,8 @@ export function readPort(addr:u16):u8 {
     t++;
 
     let result:u8 = 0xff;
-    if ((machineType==23 || machineType==77 || machineType==78 || machineType==86 || machineType==87) && (addr & 0x7E) == 0x7E) {
-        /* poll keyboard */
-        result = pollKeyboard(u8(addr >> 8));
-        updateTapePulses(t);
-        result |= tapeLevel;
-    } else if (!(addr & 0x0001)) { // SI ES PAR, ENTRA
+    if (!(addr & 0x0001)) { // SI ES PAR, ENTRA
+        console.log("READPORT - Es par");
         /* poll keyboard */
         result = pollKeyboard(u8(addr >> 8));
         updateTapePulses(t);

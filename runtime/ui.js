@@ -3,6 +3,7 @@ import { spectrum48KeyboardMap } from './keyboardMaps/spectrum48.js';
 import { spectrum128pKeyboardMap } from './keyboardMaps/spectrum128p.js';
 import { spectrum128pesKeyboardMap } from './keyboardMaps/spectrum128pes.js';
 import { spectrum128p2KeyboardMap } from './keyboardMaps/spectrum128p2.js';
+import { quorum64KeyboardMap } from './keyboardMaps/quorum64.js';
 
 import playIcon from './icons/play.svg';
 import closeIcon from './icons/close.svg';
@@ -275,7 +276,9 @@ export class inScreenKeyboard {
         }
     }
     updateKeyboard(newKeyboard, onClick) {
-        if (newKeyboard == 'spectrum128pes') {
+        if (newKeyboard == 'quorum64') {
+            this.keyboard = new quorum64KeyboardMap();
+        } else if (newKeyboard == 'spectrum128pes') {
             this.keyboard = new spectrum128pesKeyboardMap();
         } else if (newKeyboard == 'spectrum128p2') {
             this.keyboard = new spectrum128p2KeyboardMap();

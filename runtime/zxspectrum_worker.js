@@ -6,6 +6,7 @@ import { spectrum48KeyboardMap } from './keyboardMaps/spectrum48.js';
 import { spectrum128pKeyboardMap } from './keyboardMaps/spectrum128p.js';
 import { spectrum128pesKeyboardMap } from './keyboardMaps/spectrum128pes.js';
 import { spectrum128p2KeyboardMap } from './keyboardMaps/spectrum128p2.js';
+import { quorum64KeyboardMap } from './keyboardMaps/quorum64.js';
 
 let core = null;
 let memory = null;
@@ -13,7 +14,6 @@ let memoryData = null;
 let workerFrameData = null;
 let registerPairs = null;
 let tapePulses = null;
-let logEntries = null;
 
 let stopped = false;
 let tape = null;
@@ -27,15 +27,11 @@ const loadCore = (baseUrl) => {
         fetch(new URL('js8bits-core.wasm', baseUrl), {})
     ).then(results => {
         core = results.instance.exports;
-        // core.startLog();
         memory = core.memory;
         memoryData = new Uint8Array(memory.buffer);
         workerFrameData = memoryData.subarray(core.FRAME_BUFFER, FRAME_BUFFER_SIZE);
         registerPairs = new Uint16Array(core.memory.buffer, core.REGISTERS, 12);
         tapePulses = new Uint16Array(core.memory.buffer, core.TAPE_PULSES, core.TAPE_PULSES_LENGTH);
-        logEntries = new Uint16Array(core.LOG_ENTRIES);
-        // core.stopLog();
-
 
         postMessage({
             'message': 'ready',
@@ -203,7 +199,6 @@ onmessage = (e) => {
             }
             break;
         case 'keyDown':
-            // core.startLog();
             postMessage({
                 message: 'keyDown received',
                 id: Number(e.data.id),
@@ -224,7 +219,9 @@ onmessage = (e) => {
         case 'setMachineType':
             core.setMachineType(e.data.type, e.data.frameCycleCount, e.data.mainScreenStartTstate, e.data.tstatesPerRow, e.data.borderTimeMask, e.data.buildContentionTable, e.data.betadiskEnabled, e.data.betadiskROMActive, e.data.pagingLocked, e.data.memoryPageReadMap, e.data.isPentagonBased);
             const machineKeyboard = supportedMachines.getList()[e.data.type]['tech']['keyboard'];
-            if (machineKeyboard == 'spectrum128p2') {
+            if (machineKeyboard == 'quorum64') {
+                currentKeyboardMap = new quorum64KeyboardMap().getKeyCodes();
+            } else if (machineKeyboard == 'spectrum128p2') {
                 currentKeyboardMap = new spectrum128p2KeyboardMap().getKeyCodes();
             } else if (machineKeyboard == 'spectrum128pes') {
                 currentKeyboardMap = new spectrum128pesKeyboardMap().getKeyCodes();
