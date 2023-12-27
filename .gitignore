@@ -1,2 +1,3 @@
 /node_modules
-/dist
+/dist/js8bits/*
+!/dist/js8bits/README.md

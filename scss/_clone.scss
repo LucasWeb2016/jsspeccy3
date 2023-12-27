@@ -1,0 +1,15 @@
+@import 'variables';
+
+.js8bits-container {
+
+  // Clones with no custom look
+  &.clone {
+    div.js8bits-ui-bar {
+      background-image: url('images/clone.webp');
+    }
+
+    div.js8bits-ui-toolbar {
+      background-image: url('images/spectrum48-bottom.webp');
+    }
+  }
+}
