@@ -1,13 +1,36 @@
-// Variables
+// Common
 $primary-font-family: monospace;
 $font-size: 13px;
-$container-bg-color: #e5e5e5;
-$ui-bars-button-color: #fff;
-$ui-bars-button-bg-color: #808080;
-$ui-bars-button-bg-hover-color: #575757;
 $ui-bars-border-radius: 5px;
+$ui-bars-double-border-radius: 10px;
 $ui-bars-margin: 5px;
+$ui-bars-extra-margin: 10px;
 $ui-bars-padding: 5px;
-$ui-back-plastic-bg : #1b1919;
-$ui-grey-plastic-bg : #66676B;
-$ui-white-plastic-bg : #dad9cb;
+$ui-bars-extra-padding: 10px;
+
+// Colors
+$ui-container-bg-color: #e5e5e5;
+$ui-black-case : #1b1919;
+$ui-black: #000;
+$ui-grey-light : #808080;
+$ui-grey-case : #66676B;
+$ui-grey-dark : #575757;
+$ui-white : #fff;
+$ui-white-case : #dad9cb;
+$ui-magenta: #ff00ff;
+$ui-cyan: #00ffff;
+$ui-red: #ff0000;
+$ui-red-dark: #ac0f0f;
+$ui-green: #008000;
+$ui-blue: #0000ff;
+$ui-yellow: #ffff00;
+$ui-status-ok : $ui-green;
+$ui-status-ok-alt : #e9fee9;
+$ui-status-partially : #ffa500;
+$ui-status-partially-alt : #fff4df;
+$ui-status-ko : $ui-red;
+$ui-status-ko-alt :#fbe7e7;
+$ui-menu-option : $ui-cyan;
+$ui-menu-option-alt : #a6ecfc;
+
+

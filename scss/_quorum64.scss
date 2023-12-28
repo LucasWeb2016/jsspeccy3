@@ -4,12 +4,12 @@
   &.quorum64 {
     div.js8bits-ui-bar {
       background-image: url('images/spectrum128p.webp');
-      background-color: $ui-white-plastic-bg;
+      background-color: $ui-white-case;
     }
 
     div.js8bits-ui-toolbar {
       background-image: url('images/spectrum128p-bottom.webp');
-      background-color: $ui-white-plastic-bg;
+      background-color: $ui-white-case;
     }
 
     // keyboard
@@ -22,7 +22,7 @@
       }
 
       >div {
-        background-color: $ui-white-plastic-bg;
+        background-color: $ui-white-case;
         margin: auto;
         max-width: 1200px;
         padding: 7px 0px;
@@ -30,92 +30,47 @@
         &>div.keyboard-container {
           gap: 0;
           grid-template-columns: repeat(15, 1fr);
-          font-size:8px;
+          font-size: 8px;
           line-height: 9px;
 
           &>div {
             padding: 1px 2px;
+            min-height: 10px;
+            line-height: 10px;
 
             &:nth-child(37) {
               height: 100%;
-
-              &>div {
-                &.button-inner {
-                  height: 82%;
-                }
-              }
             }
 
-            &:nth-last-child(2) {
-              &>div {
-                &.button-inner {
-                  >div.button-inner1 {
-                    color: #fff;
-                  }
-                }
-              }
+            &:nth-child(n+11)>div.button-top1,
+            &:nth-last-child(2)>div.button-inner>div.button-inner1,
+            &:nth-child(n+14)>div.button-inner>div.button-inner2,
+            &:nth-child(n+14)>div.button-inner>div.button-inner3 {
+              display: block;
             }
 
-            &:nth-child(n+11) {
-              &>div.button-top1 {
-                display: block;
-              }
-            }
-
-            &:nth-child(n+14) {
-              &>div.button-inner {
-                >div.button-inner2 {
-                  width: 100%;
-                  text-align: center;
-                  top: 12px;
-                  left: 0;
-                }
-
-                >div.button-inner3 {
-                  width: 100%;
-                  text-align: center;
-                  right: 0;
-                }
-              }
-            }
-
-            &:nth-child(n+49) {
-
-              &>div.button-top1 {
-                display:none;
+            &:nth-child(n+49)>div {
+              &.button-top1 {
+                display: none;
               }
 
-              &>div.button-inner {
-                display:flex;
+              &.button-inner {
+                display: flex;
                 align-items: center;
+
                 >div.button-inner2,
                 >div.button-inner3 {
-                  display:none;
-                }
-
-                >div.button-inner1 {
-                  width: 100%;
-                  text-align: center;
-                  right: unset;
-                  top:unset;
-                  position:relative;
+                  display: none;
                 }
               }
             }
 
             &>div {
-              min-height: 10px;
-              line-height:10px;
 
-              &.button-top1 {
-                color: #fff !important;
-                background-color: unset !important;
-                text-align: center;
-              }
-
+              &.button-top1,
               &.button-top2 {
+                color: $ui-white !important;
                 text-align: center;
-                color: #fff !important;
               }
 
               &.button-bottom {
@@ -132,49 +87,46 @@
                   background-color: #1d1d1d;
                 }
 
-                &>div.button-inner1 {
-                  bottom: 2px;
-                  font-size: 16px;
-                  line-height:16px;
-                  font-weight: bold;
-                  left: 0px;
-                  position: absolute;
-                  top: unset;
-                  width: 100%;
-                  text-align: center;
-                }
-
-                &>div.button-inner2 {
-                  color: #FFF;
-                  font-weight: bold;
-                  left: 5px;
-                  position: absolute;
-                  top: 2px;
-                }
-
-                &>div.button-inner3 {
-                  color: #fff;
-                  position: absolute;
-                  right: 5px;
-                  top: 2px;
-                }
-
                 &:hover {
-                  background-color: #575757;
+                  background-color: $ui-grey-dark;
+                }
+
+                &>div {
+                  &.button-inner1 {
+                    bottom: 2px;
+                    font-size: 16px;
+                    line-height: 16px;
+                    font-weight: bold;
+                    left: 0px;
+                    position: absolute;
+                    top: unset;
+                    width: 100%;
+                    text-align: center;
+                  }
+
+                  &.button-inner2,
+                  &.button-inner3 {
+                    color: $ui-white;
+                    font-weight: bold;
+                    position: absolute;
+                    top: 2px;
+                  }
+
+                  &.button-inner2 {
+                    left: 5px;
+                  }
+
+                  &.button-inner3 {
+                    right: 5px;
+                  }
                 }
               }
             }
 
-            &.one-action-key {
-              &>div {
-                &.button-inner {
-                  &>div.button-inner1 {
-                    text-align: center;
-                    bottom: 0;
-                    font-size:8px;
-                  }
-                }
-              }
+            &.one-action-key>div.button-inner>div.button-inner1 {
+              text-align: center;
+              bottom: 0;
+              font-size: 8px;
             }
           }
         }

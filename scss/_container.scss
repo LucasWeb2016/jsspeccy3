@@ -1,0 +1,18 @@
+@import 'variables';
+
+// MOBILE FIRST
+.js8bits-container {
+  background-color: $ui-container-bg-color;
+  min-width: 250px;
+  position: relative;
+}
+
+// TABLET
+.js8bits-container.tablet {
+  // Placeholder
+}
+
+// DESKTOP
+.js8bits-container.desktop {
+  // PLACEHOLDER
+}

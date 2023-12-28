@@ -1,0 +1,311 @@
+@import 'variables';
+
+// MOBILE FIRST
+.js8bits-container {
+  div.js8bits-ui-keyboard {
+    display: none;
+
+    &.opened {
+      display: block;
+    }
+
+    >div {
+      background-color: $ui-black-case;
+      margin: auto;
+      max-width: 1200px;
+      padding: 10px 0px;
+
+      &>div.keyboard-container {
+        color: $ui-white;
+        display: grid;
+        font-family: monospace;
+        font-size: 10px;
+        gap: 0;
+        grid-template-columns: repeat(10, 10%);
+
+        &>div {
+          padding: 0px 2px;
+
+          &>div {
+            min-height: 12px;
+
+            &.button-top1 {}
+
+            &.button-top2 {
+              color: $ui-green;
+            }
+
+            &.button-inner {
+              background-color: $ui-grey-light;
+              border-radius: 5px;
+              height: 32px;
+              position: relative;
+
+              &.pushed {
+                background-color: $ui-grey-dark;
+              }
+
+              &>div.button-inner1 {
+                font-size: 16px;
+                font-weight: bold;
+                left: 3px;
+                position: absolute;
+                top: 3px;
+              }
+
+              &>div.button-inner2 {
+                color: $ui-red-dark;
+                font-weight: bold;
+                position: absolute;
+                right: 3px;
+                top: 3px;
+
+                div.zx-key {
+                  background-color: $ui-white;
+                  height: 10px;
+                  position: relative;
+                  width: 10px;
+
+                  >span {
+                    background-color: $ui-grey-light;
+                    height: 4px;
+                    position: absolute;
+                    width: 4px;
+                  }
+
+                  &.one {
+                    >span {
+                      right: 1px;
+                      top: 1px;
+                    }
+                  }
+
+                  &.two {
+                    >span {
+                      left: 1px;
+                      top: 1px;
+                    }
+                  }
+
+                  &.three {
+                    >span {
+                      right: 1px;
+                      top: 1px;
+                      width: 8px;
+                    }
+                  }
+
+                  &.four {
+                    >span {
+                      bottom: 1px;
+                      right: 1px;
+                    }
+                  }
+
+                  &.five {
+                    >span {
+                      height: 8px;
+                      right: 1px;
+                      top: 1px;
+                    }
+                  }
+
+                  &.six {
+                    >span:first-child {
+                      left: 1px;
+                      top: 1px;
+                    }
+
+                    >span:last-child {
+                      bottom: 1px;
+                      right: 1px;
+                    }
+                  }
+
+                  &.seven {
+                    border: 1px solid $ui-white;
+
+                    >span {
+                      bottom: 1px;
+                      left: 1px;
+                    }
+                  }
+                }
+              }
+
+              &>div.button-inner3 {
+                bottom: 2px;
+                color: $ui-white;
+                position: absolute;
+                right: 2px;
+              }
+
+              &:hover {
+                background-color: $ui-grey-dark;
+              }
+            }
+
+            &.button-bottom {
+              color: $ui-red;
+            }
+          }
+
+          &:nth-child(-n+10) {
+            &>div.button-top2 {
+              color: $ui-white;
+            }
+          }
+
+          &:nth-child(n+11) {
+            &>div.button-top1 {
+              display: none;
+            }
+          }
+
+          &:first-child {
+            &>div.button-top1 {
+              color: $ui-blue;
+            }
+          }
+
+          &:nth-child(2) {
+            &>div.button-top1 {
+              color: $ui-red;
+            }
+          }
+
+          &:nth-child(3) {
+            &>div.button-top1 {
+              color: $ui-magenta;
+            }
+          }
+
+          &:nth-child(4) {
+            &>div.button-top1 {
+              color: $ui-green;
+            }
+          }
+
+          &:nth-child(5) {
+            &>div.button-top1 {
+              color: $ui-cyan;
+            }
+          }
+
+          &:nth-child(6) {
+            &>div.button-top1 {
+              color: $ui-yellow;
+            }
+          }
+
+          &:nth-child(10) {
+            &>div.button-top1 {
+              background-color: $ui-white;
+              border-radius: 2px;
+              color: $ui-black;
+              padding: 0px 1px;
+              width: fit-content;
+            }
+          }
+
+          &:nth-last-child(2) {
+            &>div.button-inner {
+              >div.button-inner1 {
+                color: $ui-red-dark;
+              }
+            }
+          }
+
+          &.one-action-key {
+            &>div {
+              &.button-inner {
+                align-items: center;
+                display: flex;
+
+                &>div.button-inner1 {
+                  font-size: 10px;
+                  font-weight: bold;
+                  left: unset;
+                  position: relative;
+                  text-align: center;
+                  top: unset;
+                  width: 100%;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// TABLET
+.js8bits-container.tablet {
+  >div {
+    >div.js8bits-ui-keyboard {
+      position: absolute;
+      bottom: 40px;
+      opacity: 0.5;
+      width: 100%;
+
+      >div {
+        border-radius: 10px;
+        margin: 10px auto;
+        padding: 5px;
+
+
+        >div.keyboard-container {
+          >div {
+            padding: 0px 6px;
+
+            >div.button-top2 {
+              font-size: 10px;
+            }
+
+            >div.button-inner {
+              height: 35px;
+
+              >div.button-inner1 {
+                font-size: 20px;
+                left: 5px;
+                top: 3px;
+              }
+
+              >div.button-inner2 {
+                font-size: 12px;
+                right: 5px;
+                top: 3px;
+              }
+
+              >div.button-inner3 {
+                bottom: 3px;
+                font-size: 12px;
+                font-weight: normal;
+                right: 5px;
+              }
+            }
+
+          }
+
+          >div.one-action-key {
+            >div.button-inner {
+              >div.button-inner1 {
+                font-size: 16px;
+                left: unset;
+                line-height: 13px;
+                top: unset;
+                width: 100%;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// DESKTOP
+.js8bits-container.desktop {
+  // PLACEHOLDER
+}

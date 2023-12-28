@@ -72,15 +72,14 @@ export class uiMenu {
   }
 
   setInactiveExcept(type) {
-    // Tiene que recorrer cada hijo y solo dejar clase "active" en el correcto.
     const targets = this.list.childNodes;
-    for (var i = 0; i < targets.length; i++) {
-      if (targets[i].getAttribute('data-id') == type) {
-        targets[i].classList.add('active');
+    targets.forEach(target => {
+      if (target.getAttribute('data-id') == type) {
+        target.classList.add('active');
       } else {
-        targets[i].classList.remove('active');
+        target.classList.remove('active');
       }
-    }
+    });
   }
 
   addDataItem(item, onClick, type = false) {

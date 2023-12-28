@@ -1,0 +1,228 @@
+// MOBILE FIRST
+.js8bits-container {
+
+  @mixin common-button-styles {
+      background-color: $ui-grey-light;
+      border: 0;
+      border-radius: $ui-bars-border-radius;
+      color: $ui-white;
+      font-family: $primary-font-family;
+      font-size: 12px;
+      font-weight: bold;
+      margin: 0px $ui-bars-margin;
+      padding: 7px;
+    }
+
+    @mixin common-div-styles {
+      background-color: $ui-black-case;
+      padding: $ui-bars-padding 0px;
+    }
+
+    div.js8bits-ui-bar,
+    div.js8bits-ui-toolbar {
+      @include common-div-styles;
+
+      &>div>button,
+      &>button {
+        @include common-button-styles;
+
+        &:hover {
+          background-color: $ui-grey-dark;
+          cursor: pointer;
+        }
+      }
+
+      &>div {
+        display: inline;
+
+        &>ul {
+          background-color: $ui-white;
+          border: 3px solid $ui-black;
+          border-radius: 0;
+          color: $ui-black;
+          list-style-type: none;
+          margin: 0;
+          padding: 0;
+          position: absolute;
+          width: 200px;
+
+          li {
+            button {
+              background-color: transparent;
+              border: 0;
+              border-radius: 0;
+              color: $ui-black;
+              cursor: pointer;
+              font-family: $primary-font-family;
+              font-size: 12px;
+              font-weight: bold;
+              padding: $ui-bars-padding;
+              text-align: left;
+              width: 100%;
+
+              &.active {
+                background-color: $ui-cyan;
+              }
+            }
+
+            &:hover {
+              background-color: $ui-menu-option-alt;
+            }
+          }
+        }
+      }
+    }
+
+    div.js8bits-ui-bar {
+      background-image: url('images/spectrum48.webp');
+      background-position: right center;
+      background-repeat: no-repeat;
+      background-size: auto;
+      height: 30px;
+
+      ul#ui-bar-menu-hardware {
+        box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+        display: grid;
+        gap: 0;
+        grid-template-columns: repeat(9, auto);
+        left: 0;
+        overflow-x: auto;
+        overflow-y: auto;
+        top: 40px;
+        z-index: 3;
+        border: 0;
+
+        &>li {
+          cursor: pointer;
+          display: contents;
+
+          >div {
+            border-bottom: 1px solid $ui-white;
+            border-right: 1px solid $ui-white;
+            font-family: $primary-font-family;
+            font-size: $font-size;
+            padding: 3px 5px;
+          }
+
+          &.header {
+            >div {
+              background-color: $ui-black;
+              color: $ui-white;
+              font-weight: bold;
+            }
+          }
+
+          &:not(.header):hover {
+            >div {
+              font-weight: bold;
+            }
+          }
+
+          &.unemulated {
+            >div {
+              background-color: $ui-status-ko-alt;
+              color: $ui-status-ko;
+            }
+          }
+
+          &.emulated {
+            >div {
+              background-color: $ui-status-ok-alt;
+              color: $ui-status-ok;
+            }
+          }
+
+          &.partially {
+            >div {
+              background-color: $ui-status-partially-alt;
+              color: $ui-status-partially;
+            }
+          }
+
+          &.active {
+            >div {
+              font-weight: bold;
+
+              &:nth-child(2)::after {
+                content: " (Current machine)";
+              }
+            }
+
+            &.unemulated {
+              >div {
+                background-color: $ui-status-ko;
+                color: $ui-status-ko-alt;
+              }
+            }
+
+            &.emulated {
+              >div {
+                background-color: $ui-status-ok;
+                color: $ui-status-ok-alt;
+              }
+            }
+
+            &.partially {
+              >div {
+                background-color: $ui-status-partially;
+                color: $ui-status-partially-alt;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    div.js8bits-ui-toolbar {
+      background-image: url('images/spectrum48-bottom.webp');
+      background-position: right center;
+      background-repeat: no-repeat;
+      background-size: auto;
+      bottom: 0px;
+      height: 34px;
+      width: 100%;
+
+      &>button {
+        svg {
+          fill: $ui-white;
+        }
+      }
+    }
+
+  button.js8bits-ui-play-button {
+    background-color: rgba(160, 160, 160, 0.7);
+    border: 0;
+    border-radius: 5px;
+    height: 64px;
+    left: 50%;
+    margin-left: -48px;
+    position: absolute;
+    top: 100px;
+    width: 96px;
+
+    >svg {
+      height: 56px;
+      vertical-align: middle;
+    }
+  }
+}
+
+// TABLET
+.js8bits-container.tablet {
+   >div {
+     >button.js8bits-ui-play-button {
+        top: 125px;
+      }
+    }
+}
+
+// DESKTOP
+.js8bits-container.desktop {
+  >div {
+      >button.js8bits-ui-play-button {
+        top: 200px;
+      }
+    }
+}

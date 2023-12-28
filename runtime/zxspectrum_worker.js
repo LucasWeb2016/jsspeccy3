@@ -233,17 +233,15 @@ onmessage = (e) => {
         case 'setMachineType':
             core.setMachineType(e.data.type, e.data.frameCycleCount, e.data.mainScreenStartTstate, e.data.tstatesPerRow, e.data.borderTimeMask, e.data.buildContentionTable, e.data.betadiskEnabled, e.data.betadiskROMActive, e.data.pagingLocked, e.data.memoryPageReadMap, e.data.isPentagonBased);
             const machineKeyboard = supportedMachines.getList()[e.data.type]['tech']['keyboard'];
-            if (machineKeyboard == 'quorum64') {
-                currentKeyboardMap = new quorum64KeyboardMap().getKeyCodes();
-            } else if (machineKeyboard == 'spectrum128p2') {
-                currentKeyboardMap = new spectrum128p2KeyboardMap().getKeyCodes();
-            } else if (machineKeyboard == 'spectrum128pes') {
-                currentKeyboardMap = new spectrum128pesKeyboardMap().getKeyCodes();
-            } else if (machineKeyboard == 'spectrum128p') {
-                currentKeyboardMap = new spectrum128pKeyboardMap().getKeyCodes();
-            } else {
-                currentKeyboardMap = new spectrum48KeyboardMap().getKeyCodes();
-            }
+            const keyboardMap = {
+                'quorum64': quorum64KeyboardMap,
+                'spectrum128pes': spectrum128pesKeyboardMap,
+                'spectrum128p2': spectrum128p2KeyboardMap,
+                'spectrum128p': spectrum128pKeyboardMap,
+                'default': spectrum48KeyboardMap
+            };
+            const KeyboardClass = keyboardMap[machineKeyboard] || keyboardMap['default'];
+            currentKeyboardMap = new KeyboardClass().getKeyCodes();
             postMessage({
                 message: 'machineSetupDone',
                 keyboard: machineKeyboard

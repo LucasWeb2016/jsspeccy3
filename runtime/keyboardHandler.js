@@ -11,17 +11,16 @@ export class KeyboardHandler {
         this.eventsAreBound = false;
         this.keyboard = keyboard;
         this.devMode = devMode;
-        if (keyboard == 'quorum64') {
-            this.keycodes = new quorum64KeyboardMap().getKeyCodes();
-        } else if (keyboard == 'spectrum128pes') {
-            this.keycodes = new spectrum128pesKeyboardMap().getKeyCodes();
-        } else if (keyboard == 'spectrum128p') {
-            this.keycodes = new spectrum128pKeyboardMap().getKeyCodes();
-        } else if (keyboard=='spectrum128p2') {
-            this.keycodes = new spectrum128p2KeyboardMap().getKeyCodes();
-        } else {
-            this.keycodes = new spectrum48KeyboardMap().getKeyCodes();
-        }
+
+        const keyboardMap = {
+            'quorum64': quorum64KeyboardMap,
+            'spectrum128pes': spectrum128pesKeyboardMap,
+            'spectrum128p2': spectrum128p2KeyboardMap,
+            'spectrum128p': spectrum128pKeyboardMap,
+            'default': spectrum48KeyboardMap
+        };
+        const KeyboardClass = keyboardMap[keyboard] || keyboardMap['default'];
+        this.keycodes = new KeyboardClass().getKeyCodes();
 
         this.keydownHandler = (evt) => {
             const keyCode = this.keycodes[evt.keyCode];

@@ -5,14 +5,14 @@
 
     div.js8bits-ui-bar,
     div.js8bits-ui-toolbar {
-      background-color: $ui-grey-plastic-bg;
+      background-color: $ui-grey-case;
 
       &>div>button,
       &>button {
-        background-color: #828386;
+        background-color: $ui-grey-light;
 
         &:hover {
-          background-color: $ui-bars-button-bg-hover-color;
+          background-color: $ui-grey-dark;
         }
       }
     }
@@ -28,17 +28,17 @@
     // keyboard
     div.js8bits-ui-keyboard {
       display: none;
-      padding: 0px;
+      padding: 0;
 
       &.opened {
         display: block;
       }
 
       >div {
-        background-color: $ui-grey-plastic-bg;
+        background-color: $ui-grey-case;
         margin: auto;
         max-width: 1200px;
-        padding: 10px 0px;
+        padding: 10px 0;
 
         &>div.keyboard-container {
           font-style: italic;
@@ -51,21 +51,13 @@
             &:nth-child(37) {
               height: 100%;
 
-              &>div {
-                &.button-inner {
-                  height: 93%;
-                }
+              &>div.button-inner {
+                height: 93%;
               }
             }
 
-            &:nth-last-child(2) {
-              &>div {
-                &.button-inner {
-                  >div.button-inner1 {
-                    color: #fff;
-                  }
-                }
-              }
+            &:nth-last-child(2)>div.button-inner>div.button-inner1 {
+              color: $ui-white;
             }
 
             &>div {
@@ -77,7 +69,7 @@
               }
 
               &.button-inner {
-                background-color: #808080;
+                background-color: $ui-grey-light;
                 border-radius: 5px;
                 height: 32px;
                 position: relative;
@@ -96,7 +88,7 @@
                 }
 
                 &>div.button-inner2 {
-                  color: #FFF;
+                  color: $ui-white;
                   font-weight: bold;
                   left: 5px;
                   position: absolute;
@@ -104,27 +96,21 @@
                 }
 
                 &>div.button-inner3 {
-                  color: #fff;
+                  color: $ui-white;
                   position: absolute;
                   right: 5px;
                   top: 2px;
                 }
 
                 &:hover {
-                  background-color: #575757;
+                  background-color: $ui-grey-dark;
                 }
               }
             }
 
-            &.one-action-key {
-              &>div {
-                &.button-inner {
-                  &>div.button-inner1 {
-                    text-align: center;
-                    bottom: 0;
-                  }
-                }
-              }
+            &.one-action-key>div.button-inner>div.button-inner1 {
+              text-align: center;
+              bottom: 0;
             }
           }
         }

@@ -180,7 +180,7 @@ export class SupportedMachines {
         },
         "status": 1,
         "manufacturer": "Sinclair Research",
-        "style": "spectrum128pes",
+        "style": "spectrum128p spectrum128pes",
         "worker": "zxspectrum-worker.js",
         "comments": "Working machine",
         "family": "ZX Spectrum"
@@ -3208,9 +3208,13 @@ export class SupportedMachines {
     let stylesArray = [];
     const machineList = this.machineList;
     Object.keys(machineList).forEach(function (item) {
-      stylesArray.push(machineList[item]['style']);
+      let classes = machineList[item]['style'].split(' ');
+      classes.forEach(function (machineClass) {
+        stylesArray.push(machineClass);
+      });
     });
-    return stylesArray.filter((value, index) => stylesArray.indexOf(value) === index);
+    let result = stylesArray.filter((value, index) => stylesArray.indexOf(value) === index);
+    return result;
   }
   getRomsByMachine(type) {
     return this.machineList[type]['roms'];

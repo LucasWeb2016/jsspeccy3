@@ -1,133 +1,125 @@
 @import 'variables';
 
+@mixin common-button-styles {
+  background-color: $ui-white;
+  color: $ui-black;
+
+  &:hover {
+    background-color: $ui-grey-dark;
+  }
+}
+
+@mixin common-div-styles {
+  background-color: $ui-grey-dark;
+
+  &>div>button,
+  &>button {
+    @include common-button-styles;
+  }
+}
+
 .js8bits-container {
   &.tc2048 {
 
-      div.js8bits-ui-bar,
-      div.js8bits-ui-toolbar {
-        background-color: #3e3a3a;
+    div.js8bits-ui-bar,
+    div.js8bits-ui-toolbar {
+      @include common-div-styles;
+    }
 
-        &>div>button,
-        &>button {
-          background-color: #fff;
-          color: #000;
+    div.js8bits-ui-bar {
+      background-image: url('images/tc2048.webp');
+    }
 
-          &:hover {
-            background-color: $ui-bars-button-bg-hover-color;
-          }
-        }
-      }
+    div.js8bits-ui-toolbar {
+      background-image: url('images/tc2048-bottom.webp');
 
-      &>div {
-        &>ul {
-          li {
-            button {
-              &.active {
-                background-color: #53C6F3;
-              }
-            }
+      &>button {
+        svg {
+          fill: $ui-black;
 
-            &:hover {
-              background-color: #89a4af;
-            }
-          }
-        }
-      }
-
-      div.js8bits-ui-bar {
-        background-image: url('images/tc2048.webp');
-      }
-
-      div.js8bits-ui-toolbar {
-        background-image: url('images/tc2048-bottom.webp');
-
-        &>button {
-          svg {
-            fill: #000;
-
-            >path {
+          >path {
+            >g {
               >g {
-                >g {
-                  stroke: #474747;
-                }
-              }
-            }
-          }
-        }
-      }
-
-      div.js8bits-ui-keyboard {
-
-        >div {
-
-          &>div.keyboard-row {
-
-            &>div {
-
-              &>div {
-
-                &.button-top2 {
-                  color: #fff;
-                }
-
-                &.button-inner {
-                  background-color: #fff;
-                  cursor: pointer;
-
-                  &>div.button-inner2 {
-                    color: #000;
-
-                    div.zx-key {
-                      background-color: #fff;
-                      height: 10px;
-                      position: relative;
-                      width: 10px;
-
-                      >span {
-                        background-color: #000;
-                        height: 4px;
-                        width: 4px;
-                      }
-
-                      &.seven {
-                        background: color #fff;
-                        border: 1px solid #000;
-
-                        >span {
-                          background-color: #000;
-                          bottom: 1px;
-                          left: 1px;
-                        }
-                      }
-                    }
-                  }
-
-                  &>div.button-inner3 {}
-
-                  &:hover {}
-                }
-
-                &.button-bottom {}
-              }
-
-              &.one-action-key {
-                &>div {
-                  &.button-inner {
-                    &>div.button-inner1 {}
-                  }
-                }
-              }
-            }
-
-            &.keyboard-row-3 {
-              background-color: white;
-
-              div.button-inner1 {
-                color: #ff0000;
+                stroke: $ui-grey-dark;
               }
             }
           }
         }
       }
     }
+
+    div.js8bits-ui-keyboard {
+
+      >div {
+
+        &>div.keyboard-row {
+
+          &>div {
+
+            &>div {
+
+              &.button-top2 {
+                color: $ui-white;
+              }
+
+              &.button-inner {
+                background-color: $ui-white;
+                cursor: pointer;
+
+                &>div.button-inner2 {
+                  color: $ui-black;
+
+                  div.zx-key {
+                    background-color: $ui-white;
+                    height: 10px;
+                    position: relative;
+                    width: 10px;
+
+                    >span {
+                      background-color: $ui-black;
+                      height: 4px;
+                      width: 4px;
+                    }
+
+                    &.seven {
+                      background: color $ui-white;
+                      border: 1px solid $ui-black;
+
+                      >span {
+                        background-color: $ui-black;
+                        bottom: 1px;
+                        left: 1px;
+                      }
+                    }
+                  }
+                }
+
+                &>div.button-inner3 {}
+
+                &:hover {}
+              }
+
+              &.button-bottom {}
+            }
+
+            &.one-action-key {
+              &>div {
+                &.button-inner {
+                  &>div.button-inner1 {}
+                }
+              }
+            }
+          }
+
+          &.keyboard-row-3 {
+            background-color: $ui-white;
+
+            div.button-inner1 {
+              color: $ui-red;
+            }
+          }
+        }
+      }
+    }
+  }
 }

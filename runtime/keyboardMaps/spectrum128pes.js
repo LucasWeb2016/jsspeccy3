@@ -69,24 +69,10 @@ export class spectrum128pesKeyboardMap {
     return this.keycodes;
   }
   getKeyboardLayout() {
-    let codesArray = [];
-    const codesObject = this.keycodes;
-    Object.keys(codesObject).forEach(function (item) {
-      if (codesObject[item].type == 'key') {
-        let tempObject = codesObject[item];
-        tempObject['id'] = item;
-        codesArray.push(tempObject);
-      }
-    });
-    codesArray.sort(function (a, b) {
-      if (a.layoutRowOrder < b.layoutRowOrder) {
-        return -1;
-      }
-      if (a.layoutRowOrder > b.layoutRowOrder) {
-        return 1;
-      }
-      return 0;
-    });
+    const codesArray = Object.keys(this.keycodes)
+      .filter(item => this.keycodes[item].type == 'key')
+      .map(item => ({ ...this.keycodes[item], id: item }))
+      .sort((a, b) => a.layoutRowOrder - b.layoutRowOrder);
     return codesArray;
   }
 }
