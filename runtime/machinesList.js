@@ -216,11 +216,11 @@ export class SupportedMachines {
           "rom1": "roms\/128-plus2-1.rom",
           "rom1_page": 9,
         },
-        "status": 2,
+        "status": 1,
         "manufacturer": "Amstrad / Sinclair",
         "style": "spectrum128p2",
         "worker": "zxspectrum-worker.js",
-        "comments": "Working machine. Pending Joystick.",
+        "comments": "Working machine",
         "family": "ZX Spectrum"
       },
       "6": {
@@ -254,11 +254,11 @@ export class SupportedMachines {
           "rom1": "roms\/128-plus2es-1.rom",
           "rom1_page": 9,
         },
-        "status": 2,
+        "status": 1,
         "manufacturer": "Amstrad / Sinclair",
         "style": "spectrum128p2",
         "worker": "zxspectrum-worker.js",
-        "comments": "Working machine. Pending Joystick.",
+        "comments": "Working machine",
         "family": "ZX Spectrum"
       },
       "7": {
@@ -292,11 +292,11 @@ export class SupportedMachines {
           "rom1": "roms\/128-plus2fr-1.rom",
           "rom1_page": 9,
         },
-        "status": 2,
+        "status": 1,
         "manufacturer": "Amstrad / Sinclair",
         "style": "spectrum128p2",
         "worker": "zxspectrum-worker.js",
-        "comments": "Working machine. Pending Joystick.",
+        "comments": "Working machine.",
         "family": "ZX Spectrum"
       },
       "8": {
@@ -820,7 +820,7 @@ export class SupportedMachines {
         "family": "ZX Spectrum"
       },
       "20": {
-        "model": "Sintez 2",
+        "model": "Sintez 2 / &#1057;&#1080;&#1085;&#1090;&#1077;&#1079; 2",
         "year": "1991",
         "type": "Unlicensed",
         "country": "Moldavia (USSR)",
@@ -849,14 +849,14 @@ export class SupportedMachines {
           "rom0_page": 8,
         },
         "status": 2,
-        "manufacturer": "Signal",
+        "manufacturer": "TOP Signal / &#1053;&#1055;&#1054; &#1057;&#1080;&#1075;&#1085;&#1072;&#1083;",
         "style": "clone",
         "worker": "zxspectrum-worker.js",
-        "comments": "Joystick(2) not emulated",
+        "comments": "Kempston not emulated",
         "family": "ZX Spectrum"
       },
       "21": {
-        "model": "Sintez M",
+        "model": "Sintez M / &#1057;&#1080;&#1085;&#1090;&#1077;&#1079; M",
         "year": "1990",
         "type": "Unlicensed",
         "country": "Moldavia (USSR)",
@@ -885,15 +885,15 @@ export class SupportedMachines {
           "rom0_page": 8,
         },
         "status": 2,
-        "manufacturer": "Signal",
+        "manufacturer": "Intercomplex / &#1048;&#1085;&#1090;&#1077;&#1088;&#1082;&#1086;&#1084;&#1087;&#1083;&#1077;&#1082;&#1089;",
         "style": "clone",
         "worker": "zxspectrum-worker.js",
         "comments": "Joysticks(2) not emulated",
         "family": "ZX Spectrum"
       },
       "22": {
-        "model": "Byte / &#1041;&#1072;&#1081;&#1090;",// Hay dos clones "byte" rusos, fabricados en Brest y en Dniester. Son diferentes en todo.
-        "year": "1989", // Este es el de Brest, por lo que el diseño de front esta equivocado.
+        "model": "Byte / &#1041;&#1072;&#1081;&#1090;",
+        "year": "1989",
         "type": "Unlicensed",
         "country": "Belarus (USSR)",
         "lang": "RU",
@@ -960,7 +960,7 @@ export class SupportedMachines {
         "manufacturer": "Vector / UOMZ(&#1059;&#1054;&#1052;&#1047;) - Ural Optical-Mechanical Plant",
         "style": "quorum64",
         "worker": "zxspectrum-worker.js",
-        "comments": "No keyboard. Russified 88 keys not emulated.",
+        "comments": "Machine boots, but no keyboard. 0x7E custom keyboard port not emulated.",
         "family": "ZX Spectrum"
       },
       "26": {
@@ -1978,11 +1978,11 @@ export class SupportedMachines {
           "rom0": "roms\/48-baltic.rom",
           "rom0_page": 8,
         },
-        "status": 2,
+        "status": 1,
         "manufacturer": "Sonet",
         "style": "clone",
         "worker": "zxspectrum-worker.js",
-        "comments": "Expansion and joystick not yet emulated",
+        "comments": "Working machine",
         "family": "ZX Spectrum"
       },
       "55": {
@@ -3177,7 +3177,7 @@ export class SupportedMachines {
         "manufacturer": "Vector / UOMZ(&#1059;&#1054;&#1052;&#1047;) - Ural Optical-Mechanical Plant",
         "style": "clone",
         "worker": "zxspectrum-worker.js",
-        "comments": "No keyboard. Russified 88 keys not emulated.",
+        "comments": "Machine boots, but no keyboard. 0x7E custom keyboard port not emulated.",
         "family": "ZX Spectrum"
       }
     };

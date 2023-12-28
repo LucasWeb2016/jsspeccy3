@@ -242,14 +242,14 @@ export function parseSZXFile(data) {
     const machineId = file.getUint8(6);
     switch (machineId) {
         case 1:
-            snapshot.model = 48;
+            snapshot.model = "1";
             break;
         case 2:
         case 3:
-            snapshot.model = 128;
+            snapshot.model = "3";
             break;
         case 7:
-            snapshot.model = 5;
+            snapshot.model = "8";
             break;
         default:
             throw "Unsupported machine type: " + machineId;

@@ -2,14 +2,13 @@ import EventEmitter from 'events';
 import fileDialog from 'file-dialog';
 import JSZip from 'jszip';
 
-import { DisplayHandler } from './render.js';
-import { UIController } from './ui.js';
+import { DisplayHandler } from './displayHandler.js';
+import { UIController } from './uiController.js';
 import { parseSNAFile, parseZ80File, parseSZXFile } from './snapshot.js';
 import { TAPFile, TZXFile } from './tape.js';
-import { KeyboardHandler } from './keyboard.js';
-import { AudioHandler } from './audio.js';
+import { KeyboardHandler } from './keyboardHandler.js';
+import { AudioHandler } from './audioHandler.js';
 
-import openIcon from './icons/open.svg';
 import resetIcon from './icons/reset.svg';
 import playIcon from './icons/play.svg';
 import pauseIcon from './icons/pause.svg';
@@ -18,8 +17,9 @@ import exitFullscreenIcon from './icons/exitfullscreen.svg';
 import tapePlayIcon from './icons/tape_play.svg';
 import tapePauseIcon from './icons/tape_pause.svg';
 import keyboardIcon from './icons/keyboard.svg';
+import joystickIcon from './icons/joystick.svg';
 
-import { SupportedMachines } from './machines.js';
+import { SupportedMachines } from './machinesList.js';
 
 const scriptUrl = document.currentScript.src;
 
@@ -291,7 +291,7 @@ class Emulator extends EventEmitter {
             snapshot,
         })
 
-        this.loadRoms(snapshot.model).then(() => { this.emit('setMachine', snapshot.model); });
+        this.loadRoms(snapshot.model.toString()).then(() => { this.emit('setMachine', snapshot.model); });
         return new Promise((resolve, reject) => {
             this.fileOpenPromiseResolutions[fileID] = resolve;
         });
@@ -307,6 +307,79 @@ class Emulator extends EventEmitter {
         return new Promise((resolve, reject) => {
             this.fileOpenPromiseResolutions[fileID] = resolve;
         });
+    }
+
+    async inScreenJoystickClick(evt) {
+        if (!this.isRunning) {
+            return;
+        }
+        // get joystick type
+        const target = evt.target;
+        let targetParent = target.parentNode;
+        let joystickType = targetParent.getAttribute('data-type');
+        while (joystickType == null) {
+            targetParent = targetParent.parentNode;
+            joystickType = targetParent.getAttribute('data-type');
+        }
+
+        // Get action clicked
+        const action = target.getAttribute('data-action');
+        if (joystickType === 'kempston') {
+            // Port 0x001F
+            // 000FUDLR
+            // 00010000 -> Fight -> 0x10
+            // 00001000 -> Up -> 0x08
+            // 00000100 -> Down -> 0x04
+            // 00000010 -> Left -> 0x02
+            // 00000001 -> Right -> 0x01
+            let joystickMap = {
+                up: 0x08, // 3
+                down: 0x04, // 4
+                left: 0x02, // 1
+                right: 0x01, // 2
+                fire: 0x10, // 5
+            };
+            this.worker.postMessage({
+                message: 'kempstonKeyDown', value: joystickMap[action],
+            });
+            await new Promise(r => setTimeout(r, 150));
+            this.worker.postMessage({
+                message: 'kempstonKeyUp', value: joystickMap[action],
+            });
+        } else {
+            let joystickMap = {
+                up: 51, // 3
+                down: 52, // 4
+                left: 49, // 1
+                right: 50, // 2
+                fire: 53, // 5
+            };
+            if (joystickType === 'cursor') {
+                joystickMap = {
+                    up: 53, // 5
+                    down: 54, // 6
+                    left: 55, // 7
+                    right: 56, // 8
+                    fire: 48, // 0
+                }
+            } else if (joystickType === 'interface22') {
+                joystickMap = {
+                    up: 56, // 8
+                    down: 57, // 9
+                    left: 54, // 6
+                    right: 55, // 7
+                    fire: 48, // 0
+                }
+            }
+            if (this.devMode) console.log('Joystick Event - Type: ' + joystickType + ' - Action: ' + action)
+            this.worker.postMessage({
+                message: 'keyDown', id: joystickMap[action],
+            });
+            await new Promise(r => setTimeout(r, 150));
+            this.worker.postMessage({
+                message: 'keyUp', id: joystickMap[action],
+            });
+        }
     }
 
     async inScreenKeyBoardClick(evt) {
@@ -548,6 +621,7 @@ window.js8bits = (container, opts) => {
     const supportedMachines = new SupportedMachines();
     const keyboardEnabled = ('keyboardEnabled' in opts) ? opts.keyboardEnabled : true;
     const inScreenKeyboardEnabled = ('inScreenKeyboardEnabled' in opts) ? opts.inScreenKeyboardEnabled : true;
+    const inScreenJoystickEnabled = ('inScreenJoystickEnabled' in opts) ? opts.inScreenJoystickEnabled : true;
     const devMode = ('devMode' in opts) ? opts.devMode : false;
     const standAlone = ('standAlone' in opts) ? opts.standAlone : false;
     const uiEnabled = ('uiEnabled' in opts) ? opts.uiEnabled : true;
@@ -608,12 +682,19 @@ window.js8bits = (container, opts) => {
             })
         };
 
+        //InScreenJoystick - Based on keyboard press
+        if (inScreenJoystickEnabled) {
+            const machineJoystick = ui.joystick.addJoystick((evt) => {
+                emu.inScreenJoystickClick(evt);
+            })
+        };
+
         // Menu top
         const machineMenu = ui.menuBar.addMenu('Hardware', 'hardware');
         const machineItem = machineMenu.addDataHeader();
         const orderedMachines = supportedMachines.getOrderedList();
         Object.keys(orderedMachines).forEach(function (item) {
-            if (orderedMachines[item]['status'] >= 1 || (orderedMachines[item]['status']==0 && devMode)) {
+            if (orderedMachines[item]['status'] >= 1 || (orderedMachines[item]['status'] == 0 && devMode)) {
                 const machineItem = machineMenu.addDataItem(orderedMachines[item], () => {
                     emu.setMachine(orderedMachines[item]['id']);
                     machineItem.setActive();
@@ -749,6 +830,11 @@ window.js8bits = (container, opts) => {
             const keyboardButton = ui.toolbar.addButton({ label: 'Display keyboard' }, () => {
                 ui.keyboard.display();
             }, keyboardIcon);
+        }
+        if (inScreenJoystickEnabled) {
+            const joystickButton = ui.toolbar.addButton({ label: 'Display Joystick' }, () => {
+                ui.joystick.display();
+            }, joystickIcon);
         }
         const tapeButton = ui.toolbar.addButton({ label: 'Start tape' }, () => {
             if (emu.tapeIsPlaying) {

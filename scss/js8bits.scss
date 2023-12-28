@@ -343,7 +343,7 @@
 
           &:nth-child(n+11) {
             &>div.button-top1 {
-              display:none;
+              display: none;
             }
           }
 
@@ -424,6 +424,173 @@
     }
   }
 
+  // keyboard
+  div.js8bits-ui-joystick {
+    display: none;
+
+    &.opened {
+      display: block;
+    }
+
+    >div {
+      background-color: $ui-back-plastic-bg;
+      margin: auto;
+      //max-width: 400px;
+      padding: 10px 0px;
+      position: relative;
+      height: 170px;
+
+      &>div.select-container {
+        text-align: center;
+        >select {
+          font-size: 11px;
+          background-color: #444444;
+          color: #fff;
+          font-weight: bold;
+          border: 2px solid #808080;
+          border-radius: 5px;
+          padding: 2px;
+        }
+      }
+
+      &>div.direction-container {
+        >div {
+          position: absolute;
+          color: #fff;
+          background-color: $ui-bars-button-bg-color;
+          width: 50px;
+          height: 50px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 25px;
+          border-radius: 10px;
+          cursor: pointer;
+          border: 5px solid #444;
+
+          &:hover {
+            background-color: $ui-bars-button-bg-hover-color;
+          }
+        }
+
+
+        >div.button-up {
+          left: 70px;
+          top: 20px;
+          border-bottom-left-radius: 0px;
+          border-bottom-right-radius: 0px;
+        }
+
+        >div.button-down {
+          left: 70px;
+          top: 120px;
+          border-top-left-radius: 0px;
+          border-top-right-radius: 0px;
+        }
+
+        >div.button-left {
+          left: 20px;
+          top: 70px;
+          border-top-right-radius: 0px;
+          border-bottom-right-radius: 0px;
+        }
+
+        >div.button-separator {
+          left: 70px;
+          top: 70px;
+          border-radius: 0;
+          width: 50px;
+          height: 50px;
+          border: 5px solid #808080;
+          border-radius: 5px;
+
+          &:hover {
+            background-color: $ui-bars-button-bg-color;
+          }
+        }
+
+        >div.button-right {
+          left: 120px;
+          top: 70px;
+          border-top-left-radius: 0px;
+          border-bottom-left-radius: 0px;
+        }
+      }
+
+      &>div.fire-container {
+        position: absolute;
+        right: 10px;
+        top: 10px;
+
+        $push-color: hsla(10, 90%, 40%, 1);
+        $push-size: 150px;
+
+        >div.button-fire {
+          position: relative;
+          display: inline-block;
+          width: $push-size;
+          height: $push-size;
+          border: 0;
+          margin: 1em;
+          outline: none;
+          background-color: $push-color;
+          border-radius: 50%;
+          cursor: pointer;
+          transition: box-shadow 200ms;
+
+          box-shadow:
+            inset 0 calc($push-size/32) 0 lighten($push-color, 5%),
+            inset 0 calc(calc($push-size/32)*(-1)) 0 darken($push-color, 5%),
+            inset 0 0 0 calc($push-size/32) darken($push-color, 3%),
+            inset 0 0 0 calc($push-size/12) $push-color,
+            inset 0 0 0 calc($push-size/10) darken($push-color, 20%),
+            inset 0 0 0 calc($push-size/9.2) darken($push-color, 50%),
+            inset 0 0 0 calc($push-size/7.5) transparentize(lighten($push-color, 30%), .3),
+            inset 0 0 0 calc($push-size/5.5) $push-color,
+            inset 0 calc($push-size/2.5) calc($push-size/7.5) darken($push-color, 5%),
+            inset 0 0 calc($push-size/10) calc($push-size/6) darken($push-color, 10%),
+            0 calc($push-size/20) 0 rgba(0, 0, 0, .3);
+
+          &:after {
+            content: '';
+            position: absolute;
+            bottom: calc($push-size/20);
+            left: calc($push-size/10);
+            display: block;
+            width: calc($push-size/1.25);
+            height: calc($push-size/1.25);
+            border: calc($push-size/15) solid rgba(0, 0, 0, .3);
+            border-width: 0 0 calc($push-size/15);
+            border-radius: 50%;
+            transition-duration: 200ms;
+          }
+
+          &:active,
+          // &:hover,
+          &.is-pushed {
+            box-shadow: inset 0 calc($push-size/32) 0 lighten($push-color, 5%),
+              inset 0 calc(calc($push-size/32)*(-1)) 0 darken($push-color, 5%),
+              inset 0 0 0 calc($push-size/32) darken($push-color, 3%),
+              inset 0 0 0 calc($push-size/12) $push-color,
+              inset 0 0 0 calc($push-size/10) darken($push-color, 20%),
+              inset 0 0 0 calc($push-size/8.5) darken($push-color, 40%),
+              inset 0 0 0 calc($push-size/7.5) transparentize(lighten($push-color, 30%), .8),
+              inset 0 0 0 calc($push-size/5.5) darken($push-color, 3%),
+              inset 0 calc($push-size/2.5) calc($push-size/7.5) darken($push-color, 8%),
+              inset 0 0 calc($push-size/10) calc($push-size/6) darken($push-color, 15%),
+              0 calc($push-size/20) 0 rgba(0, 0, 0, .3);
+            background-color: darken($push-color, 2%);
+
+            &:after {
+              bottom: calc($push-size/20) + calc($push-size/15);
+              border-width: 0;
+            }
+          }
+        }
+      }
+    }
+  }
+
   // toolbar
   div.js8bits-ui-toolbar {
     background-image: url('images/spectrum48-bottom.webp');
@@ -468,10 +635,11 @@
     }
 
     >div.js8bits-ui-keyboard {
-      position:absolute;
-      bottom:40px;
-      opacity:0.5;
-      width:100%;
+      position: absolute;
+      bottom: 40px;
+      opacity: 0.5;
+      width: 100%;
+
       >div {
         border-radius: 10px;
         margin: 10px auto;

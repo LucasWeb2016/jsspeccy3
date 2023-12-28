@@ -1,5 +1,5 @@
 import { FRAME_BUFFER_SIZE } from './constants.js';
-import { SupportedMachines } from './machines.js';
+import { SupportedMachines } from './machinesList.js';
 import { TAPFile, TZXFile } from './tape.js';
 
 import { spectrum48KeyboardMap } from './keyboardMaps/spectrum48.js';
@@ -216,6 +216,20 @@ onmessage = (e) => {
             });
             core.keyUp(currentKeyboardMap[Number(e.data.id)]['row'], currentKeyboardMap[Number(e.data.id)]['mask']);
             break;
+        case 'kempstonKeyDown':
+            postMessage({
+                message: 'Kempston keyDown received',
+                value: e.data.value,
+            });
+            core.kempstonKeyDown(e.data.value);
+            break;
+        case 'kempstonKeyUp':
+            postMessage({
+                message: 'Kempston keyUp received',
+                value: e.data.value,
+            });
+            core.kempstonKeyUp(e.data.value);
+            break;
         case 'setMachineType':
             core.setMachineType(e.data.type, e.data.frameCycleCount, e.data.mainScreenStartTstate, e.data.tstatesPerRow, e.data.borderTimeMask, e.data.buildContentionTable, e.data.betadiskEnabled, e.data.betadiskROMActive, e.data.pagingLocked, e.data.memoryPageReadMap, e.data.isPentagonBased);
             const machineKeyboard = supportedMachines.getList()[e.data.type]['tech']['keyboard'];
@@ -234,7 +248,7 @@ onmessage = (e) => {
                 message: 'machineSetupDone',
                 keyboard: machineKeyboard
             });
-
+            core.startLog();
             break;
         case 'reset':
             core.reset();

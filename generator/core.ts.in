@@ -68,6 +68,7 @@ overflowSubTable = [0, FLAG_V, 0, 0, 0, 0, FLAG_V, 0];
 #alloc screenEvents[36000]: u32
 
 #alloc keyStates[8]: u8
+#alloc kempstonKeyStates[8]: u8
 
 // NB needs to start at an offset that's a multiple of 4
 #alloc audioBufferLeft[1024]: f32
@@ -280,6 +281,7 @@ setMachineType(machineType, frameCycleCount, 14335, 224, 0xfc, 0, 0, 0, 1, reset
 
 for (let i=0; i < 8; i++) {
     keyStates[i] = 0xff;
+    kempstonKeyStates[i] = 0x00;
 }
 
 export function setRegisters(af:u16, bc:u16, de:u16, hl:u16, af_:u16, bc_:u16, de_:u16, hl_:u16, ix:u16, iy:u16, sp:u16, ir:u16):void {
@@ -451,7 +453,6 @@ export function readPort(addr:u16):u8 {
 
     let result:u8 = 0xff;
     if (!(addr & 0x0001)) { // SI ES PAR, ENTRA
-        console.log("READPORT - Es par");
         /* poll keyboard */
         result = pollKeyboard(u8(addr >> 8));
         updateTapePulses(t);
@@ -460,7 +461,8 @@ export function readPort(addr:u16):u8 {
         result = readAYRegister(selectedAYRegister);
     } else if (!(addr & 0x00e0)) {
         /* kempston joystick */
-        result = 0;
+        /* poll kempston */
+        result = pollKempston(u8(addr >> 8));
     } else if (!isPentagonBased) {
         /* floating bus */
         updateFramebuffer();
@@ -713,6 +715,13 @@ export function keyUp(row:u8, mask:u8):void {
     keyStates[row] = keyStates[row] | mask;
 }
 
+export function kempstonKeyDown(value:u8):void {
+    kempstonKeyStates[1] = value;
+}
+export function kempstonKeyUp(value:u8):void {
+    kempstonKeyStates[1] = 0x00;
+}
+
 function pollKeyboard(addr:u8):u8 {
     let result:u8 = 0xbf;
     for (let row:u8 = 0; row < 8; row++) {
@@ -721,6 +730,12 @@ function pollKeyboard(addr:u8):u8 {
             result &= keyStates[row];
         }
     }
+    return result;
+}
+
+function pollKempston(addr:u8):u8 {
+    let result:u8 = 0x00;
+    result = kempstonKeyStates[1];
     return result;
 }
 
